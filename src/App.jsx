@@ -20,19 +20,65 @@ const tod=()=>new Date().toISOString().split("T")[0];
 const fmt=ds=>ds?new Date(ds+"T12:00:00").toLocaleDateString("ro-RO",{weekday:"long",day:"numeric",month:"long",year:"numeric"}):"";
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2);
 
+// === NEO-TACTILE PALETTE ===
+// Glass tokens: surfaces are translucent whites layered over a dark base.
 const C={
-  bg:"#0f0f13",su:"#1a1a24",ca:"#1e1e2e",bd:"#2e2e45",ac:"#7c5cfc",acG:"#7c5cfc55",acL:"#a78bfa",
-  gold:"#f59e0b",grn:"#22c55e",red:"#ef4444",ylw:"#fbbf24",tx:"#e2e2f0",tx2:"#8888aa",tx3:"#55557a",ip:"#13131c",
-  dA:"#10b981",dBg:"#0a1612",dSu:"#0f1f18",dCa:"#122018",dBd:"#1a3028",
-  wA:"#3b82f6",wBg:"#0a0f1a",wSu:"#0f1525",wCa:"#121c2e",wBd:"#1a2540",
-  gA:"#f97316",gBg:"#110a00",gSu:"#1a1000",gCa:"#1e1400",gBd:"#2e2000",
-  eA:"#a855f7",eSu:"#160e20",eCa:"#1c1228",eBd:"#2a1a40",
-  aA:"#76E7CD",aBg:"#001a16",aSu:"#002920",aCa:"#003828",aBd:"#005040",
-  pA:"#4a9eca",pBg:"#00080f",pSu:"#001525",pCa:"#001e35",pBd:"#003055",
+  // Base dark
+  bg:"#0a0a12",su:"rgba(255,255,255,0.04)",ca:"rgba(255,255,255,0.06)",bd:"rgba(255,255,255,0.10)",
+  // Accents
+  ac:"#3b82f6",acG:"#3b82f655",acL:"#60a5fa",
+  cyan:"#22d3ee",cyanG:"#22d3ee66",
+  gold:"#fbbf24",grn:"#22c55e",red:"#ef4444",ylw:"#fbbf24",
+  // Text
+  tx:"#f5f5fa",tx2:"rgba(245,245,250,0.65)",tx3:"rgba(245,245,250,0.40)",
+  ip:"rgba(0,0,0,0.25)",
+  // Per-tab accents (kept identifiable but now used as glass tint + active pill)
+  dA:"#10b981",dBg:"#0a1612",dSu:"rgba(16,185,129,0.06)",dCa:"rgba(16,185,129,0.07)",dBd:"rgba(16,185,129,0.20)",
+  wA:"#3b82f6",wBg:"#0a0f1a",wSu:"rgba(59,130,246,0.06)",wCa:"rgba(59,130,246,0.07)",wBd:"rgba(59,130,246,0.22)",
+  gA:"#f97316",gBg:"#110a00",gSu:"rgba(249,115,22,0.06)",gCa:"rgba(249,115,22,0.07)",gBd:"rgba(249,115,22,0.22)",
+  eA:"#a855f7",eSu:"rgba(168,85,247,0.06)",eCa:"rgba(168,85,247,0.07)",eBd:"rgba(168,85,247,0.22)",
+  aA:"#22d3ee",aBg:"#001a16",aSu:"rgba(34,211,238,0.06)",aCa:"rgba(34,211,238,0.07)",aBd:"rgba(34,211,238,0.22)",
+  pA:"#60a5fa",pBg:"#00080f",pSu:"rgba(96,165,250,0.06)",pCa:"rgba(96,165,250,0.07)",pBd:"rgba(96,165,250,0.22)",
+  rA:"#eab308",rBg:"#0c0900",rSu:"rgba(234,179,8,0.06)",rCa:"rgba(234,179,8,0.07)",rBd:"rgba(234,179,8,0.22)",
+  sgA:"#ec4899",sgCa:"rgba(236,72,153,0.07)",sgBd:"rgba(236,72,153,0.22)",
+  alA:"#dc2626",alCa:"rgba(220,38,38,0.07)",alBd:"rgba(220,38,38,0.22)",
 };
 
-const DR=[{days:0,tag:"Incepator",color:"#6b7280",glow:"#6b728044"},{days:7,tag:"Consecvent",color:"#22c55e",glow:"#22c55e44"},{days:21,tag:"Disciplinat",color:"#3b82f6",glow:"#3b82f644"},{days:50,tag:"Focusat",color:"#8b5cf6",glow:"#8b5cf644"},{days:100,tag:"Rezistent",color:"#f59e0b",glow:"#f59e0b44"},{days:150,tag:"Stapan",color:"#ef4444",glow:"#ef444444"},{days:200,tag:"Maestru",color:"#06b6d4",glow:"#06b6d444"},{days:300,tag:"Elite",color:"#ec4899",glow:"#ec489944"},{days:500,tag:"Legendar",color:"#fbbf24",glow:"#fbbf2466"}];
-const GR=[{days:0,tag:"Newbie",color:"#6b7280",glow:"#6b728044"},{days:5,tag:"Incepator",color:"#22c55e",glow:"#22c55e44"},{days:15,tag:"Consistent",color:"#3b82f6",glow:"#3b82f644"},{days:30,tag:"Athlete",color:"#8b5cf6",glow:"#8b5cf644"},{days:60,tag:"Warrior",color:"#f59e0b",glow:"#f59e0b44"},{days:100,tag:"Beast",color:"#ef4444",glow:"#ef444444"},{days:150,tag:"Elite",color:"#06b6d4",glow:"#06b6d444"},{days:200,tag:"Champion",color:"#ec4899",glow:"#ec489944"},{days:365,tag:"Legend",color:"#fbbf24",glow:"#fbbf2466"}];
+// === NEO-TACTILE STYLE HELPERS ===
+const glass = (extra={}) => ({
+  background:"rgba(255,255,255,0.05)",
+  border:"1px solid rgba(255,255,255,0.10)",
+  backdropFilter:"blur(20px) saturate(150%)",
+  WebkitBackdropFilter:"blur(20px) saturate(150%)",
+  boxShadow:"inset 0 1px 0 rgba(255,255,255,0.12), 0 8px 24px rgba(0,0,0,0.35)",
+  ...extra,
+});
+const glassTinted = (accent, alpha=0.07, extra={}) => ({
+  background:`linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01)), ${accent}${Math.round(alpha*255).toString(16).padStart(2,"0")}`,
+  border:`1px solid ${accent}33`,
+  backdropFilter:"blur(20px) saturate(150%)",
+  WebkitBackdropFilter:"blur(20px) saturate(150%)",
+  boxShadow:`inset 0 1px 0 rgba(255,255,255,0.10), 0 8px 24px rgba(0,0,0,0.35)`,
+  ...extra,
+});
+const pillActive = (accent) => ({
+  background:accent,
+  color:"#fff",
+  border:`1px solid ${accent}`,
+  boxShadow:`0 0 0 1px rgba(255,255,255,0.15) inset, 0 4px 16px ${accent}66, 0 0 24px ${accent}44`,
+});
+const pillInactive = {
+  background:"rgba(255,255,255,0.06)",
+  color:"rgba(245,245,250,0.55)",
+  border:"1px solid rgba(255,255,255,0.10)",
+  boxShadow:"inset 0 1px 0 rgba(255,255,255,0.08)",
+};
+const neonRing = (accent) => ({
+  boxShadow:`0 0 0 1px ${accent}66 inset, 0 0 20px ${accent}55, 0 0 40px ${accent}33`,
+});
+
+const DR=[{days:0,tag:"Newbie",color:"#9ca3af",glow:"#9ca3af44"},{days:5,tag:"Incepator",color:"#22c55e",glow:"#22c55e44"},{days:15,tag:"Consistent",color:"#3b82f6",glow:"#3b82f644"},{days:30,tag:"Athlete",color:"#8b5cf6",glow:"#8b5cf644"},{days:60,tag:"Warrior",color:"#f59e0b",glow:"#f59e0b44"},{days:100,tag:"Beast",color:"#ef4444",glow:"#ef444444"},{days:150,tag:"Elite",color:"#22d3ee",glow:"#22d3ee44"},{days:365,tag:"Legend",color:"#fbbf24",glow:"#fbbf2466"}];
+const GR=[{days:0,tag:"Newbie",color:"#9ca3af",glow:"#9ca3af44"},{days:5,tag:"Incepator",color:"#22c55e",glow:"#22c55e44"},{days:15,tag:"Consistent",color:"#3b82f6",glow:"#3b82f644"},{days:30,tag:"Athlete",color:"#8b5cf6",glow:"#8b5cf644"},{days:60,tag:"Warrior",color:"#f59e0b",glow:"#f59e0b44"},{days:100,tag:"Beast",color:"#ef4444",glow:"#ef444444"},{days:150,tag:"Elite",color:"#22d3ee",glow:"#22d3ee44"},{days:365,tag:"Legend",color:"#fbbf24",glow:"#fbbf2466"}];
 
 const LEGS=[
   {name:"Squat",sets:s3x("30 Kg")},
@@ -46,13 +92,15 @@ const LEGS=[
 
 const MP=[
   {id:1,name:"Push Day 1",emoji:"🔴",rest:false,exercises:[
-    {name:"Incline Chest Barbell",sets:s3x("10 Kg")},
-    {name:"Military Press",sets:s3x("5 Kg")},
-    {name:"Chest Press Oblique Grip",sets:s3x("15 Kg")},
-    {name:"Shoulder Lateral Raises",sets:s3x("50 Kg")},
-    {name:"Cable Chest Flyes",sets:s3x("18 Kg")},
-    {name:"Superset Triceps",sets:s3x("27 Kg")},
-    {name:"CBum Shoulder Raises",sets:s3x("6 Kg")},
+    {name:"5 MIN INCALZIRE",sets:[{type:"warmup",weight:"--",reps:"5 min"}]},
+    {name:"INCLINE CHEST",sets:s3x("10 Kg")},
+    {name:"SHOULDER CBUM",sets:s3x("6 Kg")},
+    {name:"CHEST PRESS",sets:s3x("15 Kg")},
+    {name:"SHOULDER LATERAL RAISES",sets:s3x("50 Kg")},
+    {name:"CABLE CHEST FLYES",sets:s3x("18 Kg")},
+    {name:"CABLE TRICEPS",sets:s3x("27 Kg")},
+    {name:"SHOULDER LATERAL RAISES",sets:s3x("50 Kg")},
+    {name:"TRICEPS STANDING MACHINE",sets:s3x("18 Kg")},
   ]},
   {id:2,name:"Pull Day 1",emoji:"🔵",rest:false,exercises:[
     {name:"Back Rope Pulls",sets:s3x("27 Kg")},
@@ -94,6 +142,13 @@ const EVE=[
   {name:"Crunch / Abdomen",sets:s3x("--")},
 ];
 
+const DEFAULT_RULES=[
+  {id:"r1",text:"Respecta-ti programul zilnic fara exceptii"},
+  {id:"r2",text:"Nu amana ce poti face astazi"},
+  {id:"r3",text:"Fii prezent si constient in fiecare moment"},
+  {id:"r4",text:"Grija de sanatatea ta este prioritara"},
+  {id:"r5",text:"Vorbeste frumos cu tine insuti"},
+];
 const DEFAULT_AFF=[
   {id:"a1",text:"Sunt suficient exact asa cum sunt in acest moment"},
   {id:"a2",text:"Aleg pacea in locul ingrijorarii"},
@@ -114,42 +169,92 @@ const INIT={
   gym:{sessionsDone:0,lastDate:"",rankUnlocks:[],history:[],mp:null,eve:null,completed:{}},
   aff:{list:null,timerStart:null,sessionsDone:0,lastSession:""},
   prayer:{morning:false,evening:false,lastDate:"",daysDone:0,prayerTexts:null},
+  rules:{list:null},
+  sugar:{lastDate:"",done:false,daysDone:0},
+  alcohol:{lastDate:"",done:false,daysDone:0},
 };
 
 function Bar({label,value,max,color,glow}){
   const p=Math.min(100,Math.round((value/max)*100));
-  return <div style={{flex:1}}><div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.tx2,marginBottom:4}}><span>{label}</span><span style={{color}}>{value}/{max}</span></div><div style={{height:8,background:"#2a2a3e",borderRadius:4,overflow:"hidden"}}><div style={{height:"100%",width:p+"%",background:color,borderRadius:4,transition:"width 0.4s",boxShadow:glow?"0 0 8px "+glow:"none"}}/></div></div>;
+  return <div style={{flex:1}}>
+    <div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:C.tx2,marginBottom:5,fontWeight:600,letterSpacing:0.5}}><span>{label}</span><span style={{color}}>{value}/{max}</span></div>
+    <div style={{height:8,background:"rgba(0,0,0,0.35)",borderRadius:99,overflow:"hidden",border:"1px solid rgba(255,255,255,0.06)",boxShadow:"inset 0 1px 2px rgba(0,0,0,0.4)"}}>
+      <div style={{height:"100%",width:p+"%",background:`linear-gradient(90deg, ${color}, ${color}dd)`,borderRadius:99,transition:"width 0.4s",boxShadow:glow?`0 0 12px ${glow}, 0 0 20px ${glow}`:`0 0 8px ${color}66`}}/>
+    </div>
+  </div>;
 }
+
 function RCard({r,nr,count,label,track}){
   const p=nr?Math.min(100,Math.round(((count-r.days)/(nr.days-r.days))*100)):100;
   return(
-    <div style={{border:"1px solid "+r.color+"44",borderRadius:14,padding:16,marginBottom:14,position:"relative",overflow:"hidden"}}>
-      <div style={{position:"absolute",top:0,left:0,right:0,height:3,background:r.color}}/>
+    <div style={{...glassTinted(r.color,0.05),borderRadius:18,padding:18,marginBottom:14,position:"relative",overflow:"hidden"}}>
+      <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg, transparent, ${r.color}, transparent)`}}/>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-        <div><div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>{label}</div><div style={{fontSize:22,fontWeight:800,color:r.color}}>{r.tag}</div><div style={{fontSize:12,color:C.tx2,marginTop:2}}>{count} zile</div></div>
-        <div style={{textAlign:"right"}}><div style={{fontSize:10,color:C.tx3,marginBottom:4}}>Urmeaza</div>{nr?<><div style={{fontSize:14,fontWeight:700,color:nr.color}}>{nr.tag}</div><div style={{fontSize:11,color:C.tx2}}>{nr.days-count} ramase</div></>:<div style={{fontSize:13,color:C.gold}}>MAX</div>}</div>
+        <div>
+          <div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:6,fontWeight:600}}>{label}</div>
+          <div style={{fontSize:22,fontWeight:800,color:r.color,letterSpacing:-0.3}}>{r.tag}</div>
+          <div style={{fontSize:12,color:C.tx2,marginTop:3}}>{count} zile</div>
+        </div>
+        <div style={{textAlign:"right"}}>
+          <div style={{fontSize:10,color:C.tx3,marginBottom:5,letterSpacing:1,textTransform:"uppercase",fontWeight:600}}>Urmeaza</div>
+          {nr?<><div style={{fontSize:14,fontWeight:700,color:nr.color}}>{nr.tag}</div><div style={{fontSize:11,color:C.tx2,marginTop:2}}>{nr.days-count} ramase</div></>:<div style={{fontSize:13,color:C.gold,fontWeight:700}}>MAX</div>}
+        </div>
       </div>
-      {nr&&<div style={{marginTop:12}}><div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:C.tx3,marginBottom:4}}><span>{r.tag}</span><span>{nr.tag}</span></div><div style={{height:6,background:track,borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",width:p+"%",background:r.color,borderRadius:3,transition:"width 0.4s"}}/></div><div style={{fontSize:10,color:C.tx3,marginTop:3,textAlign:"right"}}>{p}%</div></div>}
+      {nr&&<div style={{marginTop:14}}>
+        <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:C.tx3,marginBottom:5,letterSpacing:0.5}}><span>{r.tag}</span><span>{nr.tag}</span></div>
+        <div style={{height:6,background:"rgba(0,0,0,0.4)",borderRadius:99,overflow:"hidden",border:"1px solid rgba(255,255,255,0.04)"}}>
+          <div style={{height:"100%",width:p+"%",background:`linear-gradient(90deg, ${r.color}, ${r.color}cc)`,borderRadius:99,transition:"width 0.4s",boxShadow:`0 0 10px ${r.color}88`}}/>
+        </div>
+        <div style={{fontSize:10,color:C.tx3,marginTop:4,textAlign:"right",fontWeight:600}}>{p}%</div>
+      </div>}
     </div>
   );
 }
+
 function Strip({ranks,count,cbg}){
   const r=getR(count,ranks);
-  return <div style={{display:"flex",gap:4,marginBottom:14,flexWrap:"wrap"}}>{ranks.map((x,i)=>{const u=count>=x.days,cur=r.index===i;return <div key={x.tag} style={{fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:10,background:u?x.color+"22":cbg,color:u?x.color:C.tx3,border:cur?"1px solid "+x.color:"1px solid "+(u?x.color+"33":"#2e2e45"),opacity:u?1:0.45,boxShadow:cur?"0 0 8px "+x.glow:"none"}}>{x.tag}</div>})}</div>;
+  return <div style={{display:"flex",gap:4,marginBottom:14,width:"100%"}}>
+    {ranks.map((x,i)=>{
+      const u=count>=x.days,cur=r.index===i;
+      return <div key={x.tag} style={{
+        flex:1,minWidth:0,
+        fontSize:"clamp(7px,1.7vw,9px)",fontWeight:700,padding:"5px 2px",borderRadius:99,
+        background:cur?x.color:u?`${x.color}1a`:"rgba(255,255,255,0.03)",
+        color:cur?"#fff":u?x.color:C.tx3,
+        border:cur?`1px solid ${x.color}`:u?`1px solid ${x.color}44`:"1px solid rgba(255,255,255,0.06)",
+        opacity:u?1:0.5,
+        boxShadow:cur?`0 0 16px ${x.glow}, inset 0 1px 0 rgba(255,255,255,0.2)`:"none",
+        textAlign:"center",
+        whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis",
+      }}>{x.tag}</div>;
+    })}
+  </div>;
 }
+
 function TRow({task,ac,onToggle,onDelete,onUp,onDown,onRename}){
   const [editing,setEditing]=useState(false);
   const [val,setVal]=useState(task.text);
   function save(){const t=val.trim();if(t&&onRename)onRename(t);setEditing(false);}
   return(
-    <div style={{display:"flex",alignItems:"center",gap:8,background:task.done?"#13131c":"transparent",border:"1px solid "+(task.done?"#1e1e2e":"#2e2e45"),borderRadius:12,padding:"10px 12px",marginBottom:8,opacity:task.done?0.5:1,transition:"all 0.2s"}}>
+    <div style={{
+      display:"flex",alignItems:"center",gap:10,
+      ...(task.done?{background:"rgba(255,255,255,0.02)",border:"1px solid rgba(255,255,255,0.05)"}:glass()),
+      borderRadius:14,padding:"12px 14px",marginBottom:8,opacity:task.done?0.5:1,transition:"all 0.2s"
+    }}>
       {onUp!==undefined&&<div style={{display:"flex",flexDirection:"column",gap:2}}>
-        <button onClick={onUp} disabled={!onUp} style={{background:"none",border:"none",cursor:onUp?"pointer":"default",color:onUp?C.tx2:C.tx3+"44",fontSize:11,lineHeight:1,padding:"1px 3px"}}>▲</button>
-        <button onClick={onDown} disabled={!onDown} style={{background:"none",border:"none",cursor:onDown?"pointer":"default",color:onDown?C.tx2:C.tx3+"44",fontSize:11,lineHeight:1,padding:"1px 3px"}}>▼</button>
+        <button onClick={onUp} disabled={!onUp} style={{background:"none",border:"none",cursor:onUp?"pointer":"default",color:onUp?C.tx2:"rgba(255,255,255,0.15)",fontSize:11,lineHeight:1,padding:"1px 3px"}}>▲</button>
+        <button onClick={onDown} disabled={!onDown} style={{background:"none",border:"none",cursor:onDown?"pointer":"default",color:onDown?C.tx2:"rgba(255,255,255,0.15)",fontSize:11,lineHeight:1,padding:"1px 3px"}}>▼</button>
       </div>}
-      <button onClick={onToggle} style={{width:26,height:26,minWidth:26,borderRadius:"50%",border:task.done?"none":"2px solid "+ac,background:task.done?ac:"transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff"}}>{task.done?"✓":""}</button>
+      <button onClick={onToggle} style={{
+        width:26,height:26,minWidth:26,borderRadius:"50%",
+        border:task.done?"none":`2px solid ${ac}`,
+        background:task.done?ac:"transparent",
+        cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",
+        boxShadow:task.done?`0 0 12px ${ac}88`:`0 0 0 4px ${ac}11`,
+        transition:"all 0.2s",
+      }}>{task.done?"✓":""}</button>
       {editing
-        ?<input value={val} onChange={e=>setVal(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")save();if(e.key==="Escape")setEditing(false);}} autoFocus style={{flex:1,padding:"4px 8px",borderRadius:8,border:"1px solid "+ac,background:C.ip,color:C.tx,fontSize:14,outline:"none"}}/>
+        ?<input value={val} onChange={e=>setVal(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")save();if(e.key==="Escape")setEditing(false);}} autoFocus style={{flex:1,padding:"6px 10px",borderRadius:10,border:`1px solid ${ac}`,background:C.ip,color:C.tx,fontSize:14,outline:"none"}}/>
         :<span style={{flex:1,fontSize:14,fontWeight:task.done?400:500,textDecoration:task.done?"line-through":"none",color:task.done?C.tx3:C.tx}}>{task.text}</span>}
       {editing
         ?<><button onClick={save} style={{background:"none",border:"none",cursor:"pointer",color:C.grn,fontSize:15,padding:"0 3px",fontWeight:700}}>✓</button><button onClick={()=>setEditing(false)} style={{background:"none",border:"none",cursor:"pointer",color:C.tx3,fontSize:15,padding:"0 3px"}}>x</button></>
@@ -157,10 +262,33 @@ function TRow({task,ac,onToggle,onDelete,onUp,onDown,onRename}){
     </div>
   );
 }
-function DBadge({date,color,bg}){return <div style={{textAlign:"center",marginBottom:14}}><div style={{display:"inline-block",background:bg,border:"1px solid "+color+"44",borderRadius:10,padding:"6px 18px"}}><span style={{fontSize:13,color,fontWeight:600}}>{fmt(date)}</span></div></div>;}
-function OKBadge({color,text}){return <div style={{textAlign:"center",padding:12,background:color+"11",border:"1px solid "+color+"33",borderRadius:12,color,fontSize:13,fontWeight:600}}>✓ {text}</div>;}
-function LogBtn({can,done,tot,color,bdr,cbg,onClick}){return <button onClick={onClick} disabled={!can} style={{width:"100%",padding:13,background:can?color:cbg,color:can?"#fff":C.tx3,border:"1px solid "+(can?color:bdr),borderRadius:12,fontSize:14,fontWeight:700,cursor:can?"pointer":"default",transition:"all 0.2s"}}>{can?"✓ Marcheaza ziua ca finalizata":"Completeaza toate taskurile ("+done+"/"+tot+")"}</button>;}
-function Empty({emoji,text}){return <div style={{textAlign:"center",padding:"28px 16px",color:C.tx3,fontSize:14}}><div style={{fontSize:32,marginBottom:8}}>{emoji}</div>{text}</div>;}
+
+function DBadge({date,color,bg}){
+  return <div style={{textAlign:"center",marginBottom:16}}>
+    <div style={{display:"inline-block",...glassTinted(color,0.06),borderRadius:99,padding:"7px 20px"}}>
+      <span style={{fontSize:12,color,fontWeight:700,letterSpacing:0.5}}>{fmt(date)}</span>
+    </div>
+  </div>;
+}
+
+function OKBadge({color,text}){
+  return <div style={{textAlign:"center",padding:14,...glassTinted(color,0.08),borderRadius:14,color,fontSize:13,fontWeight:700,letterSpacing:0.3}}>✓ {text}</div>;
+}
+
+function LogBtn({can,done,tot,color,bdr,cbg,onClick}){
+  return <button onClick={onClick} disabled={!can} style={{
+    width:"100%",padding:14,
+    ...(can?pillActive(color):pillInactive),
+    borderRadius:14,fontSize:14,fontWeight:700,cursor:can?"pointer":"default",transition:"all 0.2s",
+    letterSpacing:0.3,
+  }}>{can?"✓ Marcheaza ziua ca finalizata":"Completeaza toate taskurile ("+done+"/"+tot+")"}</button>;
+}
+
+function Empty({emoji,text}){
+  return <div style={{textAlign:"center",padding:"32px 16px",color:C.tx3,fontSize:14,...glass({}),borderRadius:14}}>
+    <div style={{fontSize:32,marginBottom:8}}>{emoji}</div>{text}
+  </div>;
+}
 
 function SetRow({s,si,ei,dk,iw,ac,isEve,onToggle,onEdit}){
   const [editing,setEditing]=useState(false);
@@ -168,20 +296,32 @@ function SetRow({s,si,ei,dk,iw,ac,isEve,onToggle,onEdit}){
   const [reps,setReps]=useState(s.reps);
   function saveEdit(){onEdit("weight",kg);onEdit("reps",reps);setEditing(false);}
   return(
-    <div style={{marginBottom:4}}>
-      <div style={{display:"flex",alignItems:"center",gap:10,padding:"8px 10px",borderRadius:8,background:dk?"#1a2e00":iw?"#1a1400":"#1e1e2e",border:"1px solid "+(dk?"#22c55e33":iw?(isEve?C.eBd:C.gBd)+"88":(isEve?C.eBd:C.gBd)),opacity:dk?0.7:1}}>
-        <button onClick={onToggle} style={{width:22,height:22,minWidth:22,borderRadius:"50%",border:dk?"none":"2px solid "+(iw?"#888":ac),background:dk?C.grn:"transparent",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#fff",flexShrink:0}}>{dk?"✓":""}</button>
+    <div style={{marginBottom:5}}>
+      <div style={{
+        display:"flex",alignItems:"center",gap:10,padding:"9px 12px",borderRadius:10,
+        background:dk?"rgba(34,197,94,0.10)":iw?"rgba(255,255,255,0.03)":"rgba(255,255,255,0.05)",
+        border:dk?"1px solid rgba(34,197,94,0.35)":`1px solid rgba(255,255,255,0.10)`,
+        opacity:dk?0.75:1,
+        boxShadow:dk?`0 0 12px ${C.grn}33, inset 0 1px 0 rgba(255,255,255,0.08)`:"inset 0 1px 0 rgba(255,255,255,0.06)",
+      }}>
+        <button onClick={onToggle} style={{
+          width:22,height:22,minWidth:22,borderRadius:"50%",
+          border:dk?"none":`2px solid ${iw?"rgba(255,255,255,0.3)":ac}`,
+          background:dk?C.grn:"transparent",cursor:"pointer",
+          display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,color:"#fff",flexShrink:0,
+          boxShadow:dk?`0 0 10px ${C.grn}aa`:"none",
+        }}>{dk?"✓":""}</button>
         <div style={{flex:1}}>
-          <span style={{fontSize:11,fontWeight:700,color:iw?C.tx3:ac,marginRight:6}}>{iw?"INCALZIRE":"SET"} {si+1}</span>
+          <span style={{fontSize:10,fontWeight:700,color:iw?C.tx3:ac,marginRight:8,letterSpacing:0.8}}>{iw?"INCALZIRE":"SET"} {si+1}</span>
           <span style={{fontSize:13,color:dk?C.tx3:C.tx,textDecoration:dk?"line-through":"none"}}>{s.weight} x {s.reps} rep</span>
         </div>
-        {!dk&&<button onClick={()=>{setKg(s.weight);setReps(s.reps);setEditing(v=>!v);}} style={{background:"none",border:"1px solid "+(editing?ac:C.tx3+"55"),borderRadius:6,padding:"3px 8px",color:editing?ac:C.tx3,fontSize:11,cursor:"pointer",flexShrink:0}}>✎</button>}
+        {!dk&&<button onClick={()=>{setKg(s.weight);setReps(s.reps);setEditing(v=>!v);}} style={{background:"rgba(255,255,255,0.04)",border:`1px solid ${editing?ac:"rgba(255,255,255,0.10)"}`,borderRadius:8,padding:"4px 9px",color:editing?ac:C.tx3,fontSize:11,cursor:"pointer",flexShrink:0}}>✎</button>}
       </div>
       {editing&&!dk&&(
-        <div style={{display:"flex",gap:6,padding:"8px 10px",background:"#0f0f13",borderRadius:8,marginTop:3,alignItems:"center"}}>
-          <div style={{flex:1}}><div style={{fontSize:10,color:C.tx3,marginBottom:3}}>Kg</div><input value={kg} onChange={e=>setKg(e.target.value)} style={{width:"100%",padding:"5px 8px",borderRadius:7,border:"1px solid "+ac+"55",background:C.ip,color:C.tx,fontSize:13,outline:"none",boxSizing:"border-box"}}/></div>
-          <div style={{flex:1}}><div style={{fontSize:10,color:C.tx3,marginBottom:3}}>Rep</div><input value={reps} onChange={e=>setReps(e.target.value)} style={{width:"100%",padding:"5px 8px",borderRadius:7,border:"1px solid "+ac+"55",background:C.ip,color:C.tx,fontSize:13,outline:"none",boxSizing:"border-box"}}/></div>
-          <button onClick={saveEdit} style={{background:ac,color:"#fff",border:"none",borderRadius:8,padding:"8px 12px",fontWeight:700,fontSize:13,cursor:"pointer",marginTop:14}}>✓</button>
+        <div style={{display:"flex",gap:6,padding:"8px 10px",...glass({}),borderRadius:10,marginTop:4,alignItems:"center"}}>
+          <div style={{flex:1}}><div style={{fontSize:10,color:C.tx3,marginBottom:3,fontWeight:600}}>Kg</div><input value={kg} onChange={e=>setKg(e.target.value)} style={{width:"100%",padding:"6px 10px",borderRadius:8,border:`1px solid ${ac}44`,background:C.ip,color:C.tx,fontSize:13,outline:"none",boxSizing:"border-box"}}/></div>
+          <div style={{flex:1}}><div style={{fontSize:10,color:C.tx3,marginBottom:3,fontWeight:600}}>Rep</div><input value={reps} onChange={e=>setReps(e.target.value)} style={{width:"100%",padding:"6px 10px",borderRadius:8,border:`1px solid ${ac}44`,background:C.ip,color:C.tx,fontSize:13,outline:"none",boxSizing:"border-box"}}/></div>
+          <button onClick={saveEdit} style={{...pillActive(ac),borderRadius:10,padding:"8px 14px",fontWeight:700,fontSize:13,cursor:"pointer",marginTop:14}}>✓</button>
         </div>
       )}
     </div>
@@ -191,7 +331,7 @@ function SetRow({s,si,ei,dk,iw,ac,isEve,onToggle,onEdit}){
 export default function App(){
   const [st,setSt]=useState(()=>{
     try{
-      const s=localStorage.getItem("dq_v12");
+      const s=localStorage.getItem("dq_v13");
       if(!s)return INIT;
       const p=JSON.parse(s);
       if(!p.daily)p.daily=INIT.daily;
@@ -199,14 +339,17 @@ export default function App(){
       if(!p.gym)p.gym=INIT.gym;
       if(!p.aff)p.aff=INIT.aff;
       if(!p.prayer)p.prayer=INIT.prayer;
+      if(!p.rules)p.rules=INIT.rules;
+      if(!p.sugar)p.sugar=INIT.sugar;
+      if(!p.alcohol)p.alcohol=INIT.alcohol;
       if(!p.gym.completed)p.gym.completed={};
       return p;
     }catch{return INIT;}
   });
-  const [tab,setTab]=useState("daily");
+  const [tab,setTab]=useState("home");
   const [toast,setToast]=useState(null);
 
-  useEffect(()=>{try{localStorage.setItem("dq_v12",JSON.stringify(st));}catch{}},[st]);
+  useEffect(()=>{try{localStorage.setItem("dq_v13",JSON.stringify(st));}catch{}},[st]);
   useEffect(()=>{
     const t=tod();if(!st.setupDone)return;
     if(st.lastDate&&st.lastDate!==t){
@@ -237,35 +380,78 @@ export default function App(){
   const getAff=()=>st.aff.list||DEFAULT_AFF;
   const saveAff=l=>setSt(s=>({...s,aff:{...s.aff,list:l}}));
 
-  if(!st.setupDone)return <Setup onSetup={n=>{if(!n.trim())return;setSt(s=>({...s,heroName:n.trim(),setupDone:true,lastDate:tod()}));}}/>;
+  if(!st.setupDone)return <Setup onSetup={n=>{if(!n.trim())return;setSt(s=>({...s,heroName:n.trim(),setupDone:true,lastDate:"2026-06-10"}));}}/>;
 
   const lv=getLvl(st.xp),xpC=st.xp-xpCurLvl(lv),xpN=xpNext(lv)-xpCurLvl(lv);
-  const bg=tab==="daily"?C.dBg:tab==="work"?C.wBg:tab==="gym"?C.gBg:tab==="aff"?C.aBg:tab==="prayer"?C.pBg:C.bg;
-  const su=tab==="daily"?C.dSu:tab==="work"?C.wSu:tab==="gym"?C.gSu:tab==="aff"?C.aSu:tab==="prayer"?C.pSu:C.su;
-  const bd=tab==="daily"?C.dBd:tab==="work"?C.wBd:tab==="gym"?C.gBd:tab==="aff"?C.aBd:tab==="prayer"?C.pBd:C.bd;
+  const tabAcc=tab==="daily"?C.dA:tab==="work"?C.wA:tab==="gym"?C.gA:tab==="aff"?C.aA:tab==="prayer"?C.pA:tab==="rules"?C.rA:tab==="sugar"?C.sgA:tab==="alcohol"?C.alA:C.acL;
+
+  // Atmospheric background — dark with soft radial glow tinted by active tab accent
+  const bgStyle={
+    background:`radial-gradient(ellipse 80% 50% at 50% 0%, ${tabAcc}22, transparent 60%), radial-gradient(ellipse 60% 40% at 50% 100%, ${tabAcc}11, transparent 60%), ${C.bg}`,
+    minHeight:"100vh",
+    transition:"background 0.4s",
+  };
+
+  const tabs=[["home","🏠",C.acL,"Home"],["daily","📅",C.dA,"Daily"],["work","💼",C.wA,"Work"],["gym","🏋",C.gA,"Gym"],["aff","🌟",C.aA,"Afirmatii"],["prayer","🙏",C.pA,"Rugaciune"],["rules","📜",C.rA,"Reguli"],["sugar","🍭",C.sgA,"Zahar"],["alcohol","🍷",C.alA,"Alcool"]];
 
   return(
-    <div style={{fontFamily:"system-ui,sans-serif",background:bg,minHeight:"100vh",color:C.tx,maxWidth:420,margin:"0 auto",paddingBottom:80,transition:"background 0.3s"}}>
-      {toast&&<div style={{position:"fixed",top:18,left:"50%",transform:"translateX(-50%)",background:toast.color,color:"#000",padding:"8px 22px",borderRadius:20,fontWeight:700,fontSize:15,zIndex:999,pointerEvents:"none"}}>{toast.msg}</div>}
-      <div style={{background:su,borderBottom:"1px solid "+bd,padding:"18px 16px 14px",transition:"background 0.3s"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
-          <div><div style={{fontSize:20,fontWeight:700,marginBottom:2}}>{st.heroName}</div><div style={{fontSize:12,color:C.acL}}>Nivel {lv}</div></div>
-          <div style={{textAlign:"right"}}><div style={{fontSize:10,color:C.tx3}}>Streak</div><div style={{fontSize:28,fontWeight:800,color:C.gold,lineHeight:1}}>{st.streak}</div><div style={{fontSize:10,color:C.tx3}}>zile</div></div>
+    <div style={{fontFamily:"system-ui,-apple-system,sans-serif",color:C.tx,width:"100%",minHeight:"100vh",paddingBottom:80,...bgStyle}}>
+      {toast&&<div style={{position:"fixed",top:18,left:"50%",transform:"translateX(-50%)",...pillActive(toast.color),padding:"10px 24px",borderRadius:99,fontWeight:700,fontSize:14,zIndex:999,pointerEvents:"none",letterSpacing:0.3}}>{toast.msg}</div>}
+
+      {/* HEADER — glass card */}
+      <div style={{padding:"18px 16px 14px"}}>
+        <div style={{...glass(),borderRadius:20,padding:"16px 18px"}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}}>
+            <div>
+              <div style={{fontSize:11,color:C.tx3,letterSpacing:1.5,textTransform:"uppercase",fontWeight:600,marginBottom:2}}>Aventurier</div>
+              <div style={{fontSize:20,fontWeight:800,letterSpacing:-0.3}}>{st.heroName}</div>
+              <div style={{fontSize:12,color:tabAcc,fontWeight:600,marginTop:2}}>Nivel {lv}</div>
+            </div>
+            <div style={{textAlign:"right",...glassTinted(C.gold,0.08),borderRadius:14,padding:"6px 14px"}}>
+              <div style={{fontSize:10,color:C.tx3,letterSpacing:1,fontWeight:600}}>STREAK</div>
+              <div style={{fontSize:26,fontWeight:800,color:C.gold,lineHeight:1.1,textShadow:`0 0 18px ${C.gold}66`}}>{st.streak}</div>
+              <div style={{fontSize:10,color:C.tx3}}>zile</div>
+            </div>
+          </div>
+          <div style={{display:"flex",gap:12}}>
+            <Bar label="HP" value={st.hp} max={MAX_HP} color={st.hp>50?C.grn:st.hp>25?C.ylw:C.red}/>
+            <Bar label="XP" value={xpC} max={xpN} color={C.acL} glow={C.acG}/>
+          </div>
+          <div style={{fontSize:10,color:C.tx3,marginTop:6,textAlign:"right",letterSpacing:0.5}}>{st.xp} XP total</div>
         </div>
-        <div style={{display:"flex",gap:12}}><Bar label="HP" value={st.hp} max={MAX_HP} color={st.hp>50?C.grn:st.hp>25?C.ylw:C.red}/><Bar label="XP" value={xpC} max={xpN} color={C.acL} glow={C.acG}/></div>
-        <div style={{fontSize:10,color:C.tx3,marginTop:5,textAlign:"right"}}>{st.xp} XP total</div>
       </div>
-      <div style={{display:"flex",background:su,borderBottom:"1px solid "+bd,transition:"background 0.3s"}}>
-        {[["daily","📅",C.dA],["work","💼",C.wA],["gym","🏋️",C.gA],["aff","🌟",C.aA],["prayer","🙏",C.pA]].map(([k,l,c])=>(
-          <button key={k} onClick={()=>setTab(k)} style={{flex:1,padding:"11px 0",background:"none",border:"none",cursor:"pointer",fontSize:18,color:tab===k?c:C.tx3,borderBottom:tab===k?"2px solid "+c:"2px solid transparent",transition:"all 0.2s"}}>{l}</button>
-        ))}
+
+      {/* TAB BAR — Neo-Tactile equal-width pills */}
+      <div style={{padding:"0 16px 14px"}}>
+        <div style={{display:"flex",gap:6,width:"100%"}}>
+          {tabs.map(([k,l,c,name])=>{
+            const active=tab===k;
+            return <button key={k} onClick={()=>setTab(k)} style={{
+              ...(active?pillActive(c):pillInactive),
+              borderRadius:"50%",aspectRatio:"1 / 1",padding:0,
+              cursor:"pointer",fontSize:18,fontWeight:700,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              transition:"all 0.25s cubic-bezier(0.4,0,0.2,1)",
+              flex:1,minWidth:0,
+            }}>
+              <span style={{fontSize:"clamp(14px,3.5vw,20px)",lineHeight:1}}>{l}</span>
+            </button>;
+          })}
+        </div>
       </div>
+
+      {tab==="home"&&<HomeTab st={st} setTab={setTab}/>}
       {tab==="daily"&&<DailyTab st={st} setSt={setSt} toast={showToast}/>}
       {tab==="work"&&<WorkTab st={st} setSt={setSt} toast={showToast}/>}
       {tab==="gym"&&<GymTab st={st} setSt={setSt} toast={showToast} getMp={getMp} getEve={getEve} saveMp={saveMp} saveEve={saveEve}/>}
       {tab==="aff"&&<AffTab st={st} setSt={setSt} toast={showToast} getAff={getAff} saveAff={saveAff}/>}
       {tab==="prayer"&&<PrayerTab st={st} setSt={setSt} toast={showToast}/>}
-      <div style={{padding:"16px 16px 0",textAlign:"center"}}><button onClick={()=>{if(confirm("Resetezi tot progresul?"))setSt(INIT);}} style={{fontSize:11,color:C.tx3,background:"none",border:"none",cursor:"pointer",textDecoration:"underline"}}>Reseteaza progresul</button></div>
+      {tab==="rules"&&<RulesTab st={st} setSt={setSt} toast={showToast}/>}
+      {tab==="sugar"&&<HabitTab st={st} setSt={setSt} toast={showToast} habitKey="sugar" accent={C.sgA} tinted={C.sgCa} title="Fara zahar adaugat" subtitle="Zile fara zahar adaugat in alimentatie" emoji="🍭" tagline="O zi fara zahar adaugat"/>}
+      {tab==="alcohol"&&<HabitTab st={st} setSt={setSt} toast={showToast} habitKey="alcohol" accent={C.alA} tinted={C.alCa} title="Fara alcool" subtitle="Zile fara consum de alcool" emoji="🍷" tagline="O zi fara alcool"/>}
+      <div style={{padding:"16px 16px 0",textAlign:"center"}}>
+        <button onClick={()=>{if(confirm("Resetezi tot progresul?"))setSt(INIT);}} style={{fontSize:11,color:C.tx3,background:"none",border:"none",cursor:"pointer",textDecoration:"underline"}}>Reseteaza progresul</button>
+      </div>
     </div>
   );
 }
@@ -281,12 +467,18 @@ function DailyTab({st,setSt,toast}){
   const move=(idx,dir)=>setSt(s=>{const arr=[...s.daily.tasks];const ni=idx+dir;if(ni<0||ni>=arr.length)return s;[arr[idx],arr[ni]]=[arr[ni],arr[idx]];return{...s,daily:{...s.daily,tasks:arr}};});
   const log=()=>{if(!can)return;setSt(s=>{const nd=s.daily.daysDone+1,nr2=getR(nd,DR),or=getR(s.daily.daysDone,DR),ul=nr2.tag!==or.tag?[...(s.daily.rankUnlocks||[]),{tag:nr2.tag,date:t,color:nr2.color}]:(s.daily.rankUnlocks||[]);return{...s,daily:{...s.daily,daysDone:nd,lastDate:t,tasks:s.daily.tasks.map(x=>({...x,done:false})),rankUnlocks:ul}};});const nr2=getR(d.daysDone+1,DR);if(nr2.tag!==r.tag)toast("Rank nou: "+nr2.tag+"!",nr2.color);else toast("Zi bifata!",C.dA);};
   return(
-    <div style={{padding:"16px 16px 4px"}}>
+    <div style={{padding:"4px 16px 4px"}}>
       <DBadge date={t} color={C.dA} bg={C.dCa}/>
       <RCard r={r} nr={nr} count={d.daysDone} label="Rank zilnic" track="#0a1612"/>
       <Strip ranks={DR} count={d.daysDone} cbg={C.dCa}/>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><div><div style={{fontWeight:700,fontSize:15}}>Taskuri de azi</div><div style={{fontSize:12,color:C.tx2}}>{dc}/{d.tasks.length} bifate</div></div><button onClick={()=>setSa(v=>!v)} style={{background:sa?C.dCa:C.dA,color:sa?C.tx2:"#fff",border:"none",borderRadius:20,padding:"7px 14px",fontWeight:700,fontSize:13,cursor:"pointer"}}>{sa?"Anuleaza":"+ Task"}</button></div>
-      {sa&&<div style={{display:"flex",gap:8,marginBottom:12}}><input value={nw} onChange={e=>setNw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&add()} placeholder="Task zilnic..." autoFocus style={{flex:1,padding:"10px 12px",borderRadius:10,border:"1px solid "+C.dA+"55",background:C.ip,color:C.tx,fontSize:14,outline:"none"}}/><button onClick={add} style={{background:C.dA,color:"#fff",border:"none",borderRadius:10,padding:"10px 14px",fontWeight:700,fontSize:14,cursor:"pointer"}}>Add</button></div>}
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,marginTop:4}}>
+        <div><div style={{fontWeight:700,fontSize:15}}>Taskuri de azi</div><div style={{fontSize:12,color:C.tx2,marginTop:2}}>{dc}/{d.tasks.length} bifate</div></div>
+        <button onClick={()=>setSa(v=>!v)} style={{...(sa?pillInactive:pillActive(C.dA)),borderRadius:99,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",letterSpacing:0.3}}>{sa?"Anuleaza":"+ Task"}</button>
+      </div>
+      {sa&&<div style={{display:"flex",gap:8,marginBottom:12}}>
+        <input value={nw} onChange={e=>setNw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&add()} placeholder="Task zilnic..." autoFocus style={{flex:1,padding:"11px 14px",borderRadius:12,border:`1px solid ${C.dA}55`,background:C.ip,color:C.tx,fontSize:14,outline:"none"}}/>
+        <button onClick={add} style={{...pillActive(C.dA),borderRadius:12,padding:"11px 18px",fontWeight:700,fontSize:14,cursor:"pointer"}}>Add</button>
+      </div>}
       {d.tasks.length===0&&<Empty emoji="📅" text="Niciun task!"/>}
       {d.tasks.map((x,i)=><TRow key={x.id} task={x} ac={C.dA} onToggle={()=>tog(x.id)} onDelete={()=>del(x.id)} onUp={i>0?()=>move(i,-1):null} onDown={i<d.tasks.length-1?()=>move(i,1):null} onRename={t=>rename(x.id,t)}/>)}
       <div style={{marginTop:16}}>{al?<OKBadge color={C.dA} text="Zi inregistrata azi"/>:<LogBtn can={can} done={dc} tot={d.tasks.length} color={C.dA} bdr={C.dBd} cbg={C.dCa} onClick={log}/>}</div>
@@ -302,11 +494,19 @@ function WorkTab({st,setSt,toast}){
   const tog=id=>setSt(s=>({...s,work:{...s.work,tasks:s.work.tasks.map(x=>x.id===id?{...x,done:!x.done}:x)}}));
   const del=id=>setSt(s=>({...s,work:{...s.work,tasks:s.work.tasks.filter(x=>x.id!==id)}}));
   return(
-    <div style={{padding:"16px 16px 4px"}}>
+    <div style={{padding:"4px 16px 4px"}}>
       <DBadge date={t} color={C.wA} bg={C.wCa}/>
-      <div style={{background:C.wCa,border:"1px solid "+C.wBd,borderRadius:14,padding:14,marginBottom:14}}><div style={{fontSize:12,color:C.tx2,lineHeight:1.6}}>Taskurile bifate se sterg automat la miezul noptii. Cele nebifate raman pentru ziua urmatoare.</div></div>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><div><div style={{fontWeight:700,fontSize:15}}>Taskuri munca</div><div style={{fontSize:12,color:C.tx2}}>{dc}/{w.tasks.length} bifate</div></div><button onClick={()=>setSa(v=>!v)} style={{background:sa?C.wCa:C.wA,color:sa?C.tx2:"#fff",border:"none",borderRadius:20,padding:"7px 14px",fontWeight:700,fontSize:13,cursor:"pointer"}}>{sa?"Anuleaza":"+ Task"}</button></div>
-      {sa&&<div style={{display:"flex",gap:8,marginBottom:12}}><input value={nw} onChange={e=>setNw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&add()} placeholder="Task de munca..." autoFocus style={{flex:1,padding:"10px 12px",borderRadius:10,border:"1px solid "+C.wA+"55",background:C.ip,color:C.tx,fontSize:14,outline:"none"}}/><button onClick={add} style={{background:C.wA,color:"#fff",border:"none",borderRadius:10,padding:"10px 14px",fontWeight:700,fontSize:14,cursor:"pointer"}}>Add</button></div>}
+      <div style={{...glassTinted(C.wA,0.06),borderRadius:14,padding:14,marginBottom:14}}>
+        <div style={{fontSize:12,color:C.tx2,lineHeight:1.6}}>Taskurile bifate se sterg automat la miezul noptii. Cele nebifate raman pentru ziua urmatoare.</div>
+      </div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
+        <div><div style={{fontWeight:700,fontSize:15}}>Taskuri munca</div><div style={{fontSize:12,color:C.tx2,marginTop:2}}>{dc}/{w.tasks.length} bifate</div></div>
+        <button onClick={()=>setSa(v=>!v)} style={{...(sa?pillInactive:pillActive(C.wA)),borderRadius:99,padding:"8px 16px",fontWeight:700,fontSize:13,cursor:"pointer",letterSpacing:0.3}}>{sa?"Anuleaza":"+ Task"}</button>
+      </div>
+      {sa&&<div style={{display:"flex",gap:8,marginBottom:12}}>
+        <input value={nw} onChange={e=>setNw(e.target.value)} onKeyDown={e=>e.key==="Enter"&&add()} placeholder="Task de munca..." autoFocus style={{flex:1,padding:"11px 14px",borderRadius:12,border:`1px solid ${C.wA}55`,background:C.ip,color:C.tx,fontSize:14,outline:"none"}}/>
+        <button onClick={add} style={{...pillActive(C.wA),borderRadius:12,padding:"11px 18px",fontWeight:700,fontSize:14,cursor:"pointer"}}>Add</button>
+      </div>}
       {w.tasks.length===0&&<Empty emoji="💼" text="Niciun task!"/>}
       {w.tasks.map(x=><TRow key={x.id} task={x} ac={C.wA} onToggle={()=>tog(x.id)} onDelete={()=>del(x.id)}/>)}
     </div>
@@ -335,7 +535,7 @@ function GymTab({st,setSt,toast,getMp,getEve,saveMp,saveEve}){
   const finish=()=>{
     const type=view==="mw"?"morning":"evening";
     const ck=compKey(aDay.id,type);
-    setSt(s=>{const ns=s.gym.sessionsDone+1,nr2=getR(ns,GR),or=getR(s.gym.sessionsDone,GR),ul=nr2.tag!==or.tag?[...(s.gym.rankUnlocks||[]),{tag:nr2.tag,date:t,color:nr2.color}]:(s.gym.rankUnlocks||[]),lbl=view==="mw"?"Dimineata "+aDay.name:"Seara Kettlebell";return{...s,gym:{...s.gym,sessionsDone:ns,lastDate:t,rankUnlocks:ul,history:[{date:t,day:lbl},...(s.gym.history||[])].slice(0,50),completed:{...(s.gym.completed||{}),[ck]:true}}};});
+    setSt(s=>{const ns=s.gym.sessionsDone+1,nr2=getR(ns,GR),or=getR(s.gym.sessionsDone,GR),ul=nr2.tag!==or.tag?[...(s.gym.rankUnlocks||[]),{tag:nr2.tag,date:t,color:nr2.color}]:(s.gym.rankUnlocks||[]),lbl=view==="mw"?"Dimineata "+aDay.name:"Antrenament Kettlebell CORE";return{...s,gym:{...s.gym,sessionsDone:ns,lastDate:t,rankUnlocks:ul,history:[{date:t,day:lbl},...(s.gym.history||[])].slice(0,50),completed:{...(s.gym.completed||{}),[ck]:true}}};});
     const nr2=getR(g.sessionsDone+1,GR);if(nr2.tag!==r.tag)toast("Gym Rank: "+nr2.tag+"!",nr2.color);else toast("Sesiune finalizata!",C.gA);setLogged(true);
   };
   const isEve=view==="ee"||view==="ew";
@@ -349,54 +549,54 @@ function GymTab({st,setSt,toast,getMp,getEve,saveMp,saveEve}){
     const rmS=(ei,si)=>{if(eMode==="evening"){setEData(a=>{const b=[...a];b[ei]={...b[ei],sets:b[ei].sets.filter((_,i)=>i!==si)};return b;});}else{setEData(d=>{const e=[...d.exercises];e[ei]={...e[ei],sets:e[ei].sets.filter((_,i)=>i!==si)};return{...d,exercises:e};});}};
     const addEx=()=>{const nx={name:"Exercitiu nou",sets:s3x("--")};if(eMode==="evening")setEData(a=>[...a,nx]);else setEData(d=>({...d,exercises:[...d.exercises,nx]}));};
     const rmEx=(ei)=>{if(eMode==="evening")setEData(a=>a.filter((_,i)=>i!==ei));else setEData(d=>({...d,exercises:d.exercises.filter((_,i)=>i!==ei)}));};
-    const ip2={padding:"6px 8px",borderRadius:7,border:"1px solid "+(isEve?C.eBd:C.gBd),background:C.ip,color:C.tx,fontSize:13,outline:"none"};
+    const ip2={padding:"7px 10px",borderRadius:9,border:`1px solid ${ac}33`,background:C.ip,color:C.tx,fontSize:13,outline:"none"};
     return(
       <div style={{paddingBottom:16}}>
-        <div style={{background:isEve?C.eSu:C.gSu,borderBottom:"1px solid "+(isEve?C.eBd:C.gBd),padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-          <button onClick={()=>setView("list")} style={{background:"none",border:"none",color:C.tx3,fontSize:13,fontWeight:700,cursor:"pointer"}}>Anuleaza</button>
-          <span style={{fontSize:14,fontWeight:800,color:ac}}>{isEve?"Seara":"Dimineata"}</span>
-          <button onClick={saveE} style={{background:ac,color:"#fff",border:"none",borderRadius:10,padding:"6px 14px",fontWeight:700,fontSize:13,cursor:"pointer"}}>Salveaza</button>
+        <div style={{...glass(),borderRadius:0,padding:"14px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:14}}>
+          <button onClick={()=>setView("list")} style={{...pillInactive,borderRadius:99,padding:"7px 14px",fontSize:13,fontWeight:700,cursor:"pointer"}}>Anuleaza</button>
+          <span style={{fontSize:14,fontWeight:800,color:ac,letterSpacing:0.5}}>{isEve?"Seara":"Dimineata"}</span>
+          <button onClick={saveE} style={{...pillActive(ac),borderRadius:99,padding:"7px 16px",fontWeight:700,fontSize:13,cursor:"pointer"}}>Salveaza</button>
         </div>
-        <div style={{padding:"12px 16px"}}>
-          {eMode!=="evening"&&<div style={{marginBottom:12}}><div style={{fontSize:10,color:C.tx3,letterSpacing:1,textTransform:"uppercase",marginBottom:4}}>Numele zilei</div><input value={eData.name} onChange={e=>setEData(d=>({...d,name:e.target.value}))} style={{...ip2,width:"100%",boxSizing:"border-box",fontSize:15,fontWeight:700}}/></div>}
+        <div style={{padding:"4px 16px"}}>
+          {eMode!=="evening"&&<div style={{marginBottom:12}}><div style={{fontSize:10,color:C.tx3,letterSpacing:1.5,textTransform:"uppercase",marginBottom:5,fontWeight:600}}>Numele zilei</div><input value={eData.name} onChange={e=>setEData(d=>({...d,name:e.target.value}))} style={{...ip2,width:"100%",boxSizing:"border-box",fontSize:15,fontWeight:700}}/></div>}
           {exs.map((ex,ei)=>(
-            <div key={ei} style={{background:isEve?C.eCa:C.gCa,border:"1px solid "+(isEve?C.eBd:C.gBd),borderRadius:12,padding:"12px 14px",marginBottom:10}}>
+            <div key={ei} style={{...glassTinted(ac,0.06),borderRadius:14,padding:"12px 14px",marginBottom:10}}>
               <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:10}}><input value={ex.name} onChange={e=>updEx(ei,"name",e.target.value)} style={{...ip2,flex:1,fontWeight:700,color:ac}}/><button onClick={()=>rmEx(ei)} style={{background:"none",border:"none",cursor:"pointer",color:C.red,fontSize:18,padding:"0 4px"}}>x</button></div>
               {ex.sets.map((s,si)=>(
                 <div key={si} style={{display:"flex",gap:6,alignItems:"center",marginBottom:6}}>
-                  <select value={s.type} onChange={e=>updS(ei,si,"type",e.target.value)} style={{...ip2,padding:"5px 4px",fontSize:11}}><option value="working">SET</option><option value="warmup">INCALZIRE</option></select>
+                  <select value={s.type} onChange={e=>updS(ei,si,"type",e.target.value)} style={{...ip2,padding:"6px 4px",fontSize:11}}><option value="working">SET</option><option value="warmup">INCALZIRE</option></select>
                   <input value={s.weight} onChange={e=>updS(ei,si,"weight",e.target.value)} placeholder="Kg" style={{...ip2,flex:1}}/>
                   <input value={s.reps} onChange={e=>updS(ei,si,"reps",e.target.value)} placeholder="Rep" style={{...ip2,width:44,textAlign:"center"}}/>
                   <button onClick={()=>rmS(ei,si)} style={{background:"none",border:"none",cursor:"pointer",color:C.tx3,fontSize:16,lineHeight:1}}>x</button>
                 </div>
               ))}
-              <button onClick={()=>addS(ei)} style={{marginTop:4,background:"none",border:"1px dashed "+(isEve?C.eBd:C.gBd),color:C.tx3,borderRadius:8,padding:"5px 12px",fontSize:12,cursor:"pointer",width:"100%"}}>+ Set</button>
+              <button onClick={()=>addS(ei)} style={{marginTop:6,background:"rgba(255,255,255,0.04)",border:`1px dashed ${ac}55`,color:C.tx2,borderRadius:10,padding:"6px 12px",fontSize:12,cursor:"pointer",width:"100%"}}>+ Set</button>
             </div>
           ))}
-          <button onClick={addEx} style={{width:"100%",padding:12,background:"none",border:"1px dashed "+ac+"55",color:ac,borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",marginTop:4}}>+ Exercitiu nou</button>
+          <button onClick={addEx} style={{width:"100%",padding:13,background:"rgba(255,255,255,0.04)",border:`1px dashed ${ac}66`,color:ac,borderRadius:14,fontSize:14,fontWeight:700,cursor:"pointer",marginTop:6}}>+ Exercitiu nou</button>
         </div>
       </div>
     );
   }
 
   if(view==="mw"||view==="ew"){
-    const title=view==="ew"?"Seara -- Kettlebell & Core":"Dimineata -- "+aDay.name;
+    const title=view==="ew"?"Antrenament Kettlebell CORE":"Dimineata -- "+aDay.name;
     const tot=cTot(aSess),done=cDone(),pct=tot>0?Math.round((done/tot)*100):0,all=done===tot&&tot>0;
     return(
       <div style={{paddingBottom:16}}>
-        <div style={{background:isEve?C.eSu:C.gSu,borderBottom:"1px solid "+(isEve?C.eBd:C.gBd),padding:"14px 16px"}}>
-          <button onClick={()=>setView("list")} style={{background:"none",border:"none",color:ac,fontSize:13,fontWeight:700,cursor:"pointer",paddingBottom:8}}>Inapoi</button>
+        <div style={{...glass(),borderRadius:0,padding:"14px 16px",marginBottom:14}}>
+          <button onClick={()=>setView("list")} style={{...pillInactive,borderRadius:99,padding:"6px 14px",fontSize:12,fontWeight:700,cursor:"pointer",marginBottom:10,color:ac}}>← Inapoi</button>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-            <div><div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase"}}>ANTRENAMENT ACTIV</div><div style={{fontSize:16,fontWeight:800,color:ac}}>{title}</div></div>
-            <div style={{textAlign:"right"}}><div style={{fontSize:22,fontWeight:800,color:all?C.grn:ac}}>{pct}%</div><div style={{fontSize:11,color:C.tx2}}>{done}/{tot}</div></div>
+            <div><div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",fontWeight:600}}>ANTRENAMENT ACTIV</div><div style={{fontSize:16,fontWeight:800,color:ac,marginTop:2}}>{title}</div></div>
+            <div style={{textAlign:"right"}}><div style={{fontSize:22,fontWeight:800,color:all?C.grn:ac,textShadow:`0 0 14px ${all?C.grn:ac}66`}}>{pct}%</div><div style={{fontSize:11,color:C.tx2}}>{done}/{tot}</div></div>
           </div>
-          <div style={{marginTop:10,height:6,background:isEve?"#0e0814":"#2e2000",borderRadius:3,overflow:"hidden"}}><div style={{height:"100%",width:pct+"%",background:all?C.grn:ac,borderRadius:3,transition:"width 0.3s"}}/></div>
+          <div style={{marginTop:12,height:6,background:"rgba(0,0,0,0.4)",borderRadius:99,overflow:"hidden",border:"1px solid rgba(255,255,255,0.05)"}}><div style={{height:"100%",width:pct+"%",background:`linear-gradient(90deg, ${all?C.grn:ac}, ${all?C.grn:ac}cc)`,borderRadius:99,transition:"width 0.3s",boxShadow:`0 0 10px ${all?C.grn:ac}88`}}/></div>
           <div style={{textAlign:"center",marginTop:8,fontSize:12,color:C.tx2}}>{fmt(t)}</div>
         </div>
-        <div style={{padding:"12px 16px"}}>
+        <div style={{padding:"0 16px"}}>
           {aSess.map((ex,ei)=>(
-            <div key={ei} style={{background:isEve?C.eCa:C.gCa,border:"1px solid "+(isEve?C.eBd:C.gBd),borderRadius:12,padding:"12px 14px",marginBottom:10}}>
-              <div style={{fontSize:13,fontWeight:800,color:ac,marginBottom:8,textTransform:"uppercase",letterSpacing:0.5}}>{ex.name}</div>
+            <div key={ei} style={{...glassTinted(ac,0.06),borderRadius:14,padding:"12px 14px",marginBottom:10}}>
+              <div style={{fontSize:13,fontWeight:800,color:ac,marginBottom:10,textTransform:"uppercase",letterSpacing:0.8}}>{ex.name}</div>
               {ex.sets.map((s,si)=>(
                 <SetRow key={si} s={s} si={si} ei={ei} dk={!!dn[ei+"-"+si]} iw={s.type==="warmup"} ac={ac} isEve={isEve}
                   onToggle={()=>togS(ei,si)}
@@ -405,43 +605,63 @@ function GymTab({st,setSt,toast,getMp,getEve,saveMp,saveEve}){
               ))}
             </div>
           ))}
-          <div style={{marginTop:8}}>{logged?<OKBadge color={C.grn} text="Sesiune inregistrata!"/>:<button onClick={finish} disabled={!all} style={{width:"100%",padding:13,background:all?ac:(isEve?C.eCa:C.gCa),color:all?"#fff":C.tx3,border:"1px solid "+(all?ac:(isEve?C.eBd:C.gBd)),borderRadius:12,fontSize:14,fontWeight:700,cursor:all?"pointer":"default",transition:"all 0.2s"}}>{all?"Finalizeaza":"Completeaza toate seturile ("+done+"/"+tot+")"}</button>}</div>
+          <div style={{marginTop:10}}>{logged?<OKBadge color={C.grn} text="Sesiune inregistrata!"/>:<button onClick={finish} disabled={!all} style={{width:"100%",padding:14,...(all?pillActive(ac):pillInactive),borderRadius:14,fontSize:14,fontWeight:700,cursor:all?"pointer":"default",transition:"all 0.2s",letterSpacing:0.3}}>{all?"Finalizeaza":"Completeaza toate seturile ("+done+"/"+tot+")"}</button>}</div>
         </div>
       </div>
     );
   }
 
   return(
-    <div style={{padding:"16px 16px 4px"}}>
+    <div style={{padding:"4px 16px 4px"}}>
       <DBadge date={t} color={C.gA} bg={C.gCa}/>
       <RCard r={r} nr={nr} count={g.sessionsDone} label="Gym Rank" track="#110a00"/>
       <Strip ranks={GR} count={g.sessionsDone} cbg={C.gCa}/>
-      <div style={{fontWeight:700,fontSize:15,marginBottom:10}}>Program Saptamanal</div>
+      <div style={{fontWeight:700,fontSize:15,marginBottom:12,marginTop:4}}>Program Saptamanal</div>
       {mp.map(day=>(
-        <div key={day.id} style={{background:C.gCa,border:"1px solid "+C.gBd,borderRadius:14,padding:"12px 14px",marginBottom:10,opacity:day.rest?0.6:1}}>
-          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:day.rest?0:10}}>
+        <div key={day.id} style={{...glassTinted(C.gA,0.05),borderRadius:14,padding:"12px 14px",marginBottom:10,opacity:day.rest?0.6:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:day.rest?0:12}}>
             <div style={{fontSize:22,lineHeight:1}}>{day.emoji}</div>
-            <div style={{flex:1}}><div style={{fontSize:15,fontWeight:800,color:day.rest?C.tx3:C.tx}}>Ziua {day.id} -- {day.name}</div>{!day.rest&&<div style={{fontSize:11,color:C.tx2,marginTop:1}}>{day.exercises.length} exercitii</div>}</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:15,fontWeight:800,color:day.rest?C.tx3:C.tx,letterSpacing:-0.2}}>Ziua {day.id} -- {day.name}</div>
+              {!day.rest&&<div style={{fontSize:11,color:C.tx2,marginTop:2}}>{day.exercises.length} exercitii</div>}
+            </div>
           </div>
           {!day.rest&&(
             <div style={{display:"flex",gap:8}}>
               <div style={{flex:1}}>
                 <div style={{fontSize:10,color:C.gA,fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:6}}>Dimineata</div>
                 {isComp(day.id,"morning")
-                  ?<div style={{display:"flex",gap:6}}><div style={{flex:1,padding:"8px 0",background:C.grn+"22",border:"1px solid "+C.grn+"55",borderRadius:9,color:C.grn,fontSize:12,fontWeight:700,textAlign:"center"}}>Completat</div><button onClick={()=>resetComp(day.id,"morning")} style={{padding:"8px 10px",background:"none",border:"1px solid "+C.gBd,borderRadius:9,color:C.tx3,fontSize:12,cursor:"pointer"}}>↺</button></div>
-                  :<div style={{display:"flex",gap:6}}><button onClick={()=>startW(day,"morning")} style={{flex:1,padding:"8px 0",background:C.gA+"22",border:"1px solid "+C.gA+"55",borderRadius:9,color:C.gA,fontSize:12,fontWeight:700,cursor:"pointer"}}>Start</button><button onClick={()=>startE(day,"morning")} style={{padding:"8px 10px",background:"none",border:"1px solid "+C.gBd,borderRadius:9,color:C.tx3,fontSize:12,cursor:"pointer"}}>✎</button></div>}
+                  ?<div style={{display:"flex",gap:6}}>
+                    <div style={{flex:1,padding:"9px 0",...glassTinted(C.grn,0.10),borderRadius:99,color:C.grn,fontSize:12,fontWeight:700,textAlign:"center"}}>✓ Complet</div>
+                    <button onClick={()=>resetComp(day.id,"morning")} style={{padding:"9px 12px",...pillInactive,borderRadius:99,fontSize:12,cursor:"pointer"}}>↺</button>
+                  </div>
+                  :<div style={{display:"flex",gap:6}}>
+                    <button onClick={()=>startW(day,"morning")} style={{flex:1,padding:"9px 0",...pillActive(C.gA),borderRadius:99,fontSize:12,fontWeight:700,cursor:"pointer"}}>Start</button>
+                    <button onClick={()=>startE(day,"morning")} style={{padding:"9px 12px",...pillInactive,borderRadius:99,fontSize:12,cursor:"pointer"}}>✎</button>
+                  </div>}
               </div>
               <div style={{flex:1}}>
                 <div style={{fontSize:10,color:C.eA,fontWeight:700,letterSpacing:1,textTransform:"uppercase",marginBottom:6}}>Seara</div>
                 {isComp(day.id,"evening")
-                  ?<div style={{display:"flex",gap:6}}><div style={{flex:1,padding:"8px 0",background:C.grn+"22",border:"1px solid "+C.grn+"55",borderRadius:9,color:C.grn,fontSize:12,fontWeight:700,textAlign:"center"}}>Completat</div><button onClick={()=>resetComp(day.id,"evening")} style={{padding:"8px 10px",background:"none",border:"1px solid "+C.eBd,borderRadius:9,color:C.tx3,fontSize:12,cursor:"pointer"}}>↺</button></div>
-                  :<div style={{display:"flex",gap:6}}><button onClick={()=>startW(day,"evening")} style={{flex:1,padding:"8px 0",background:C.eA+"22",border:"1px solid "+C.eA+"55",borderRadius:9,color:C.eA,fontSize:12,fontWeight:700,cursor:"pointer"}}>Start</button><button onClick={()=>startE(day,"evening")} style={{padding:"8px 10px",background:"none",border:"1px solid "+C.eBd,borderRadius:9,color:C.tx3,fontSize:12,cursor:"pointer"}}>✎</button></div>}
+                  ?<div style={{display:"flex",gap:6}}>
+                    <div style={{flex:1,padding:"9px 0",...glassTinted(C.grn,0.10),borderRadius:99,color:C.grn,fontSize:12,fontWeight:700,textAlign:"center"}}>✓ Complet</div>
+                    <button onClick={()=>resetComp(day.id,"evening")} style={{padding:"9px 12px",...pillInactive,borderRadius:99,fontSize:12,cursor:"pointer"}}>↺</button>
+                  </div>
+                  :<div style={{display:"flex",gap:6}}>
+                    <button onClick={()=>startW(day,"evening")} style={{flex:1,padding:"9px 0",...pillActive(C.eA),borderRadius:99,fontSize:12,fontWeight:700,cursor:"pointer"}}>Start</button>
+                    <button onClick={()=>startE(day,"evening")} style={{padding:"9px 12px",...pillInactive,borderRadius:99,fontSize:12,cursor:"pointer"}}>✎</button>
+                  </div>}
               </div>
             </div>
           )}
         </div>
       ))}
-      {g.history?.length>0&&<div style={{marginTop:16}}><div style={{fontSize:10,color:C.tx3,letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Istoric</div>{g.history.slice(0,5).map((h,i)=><div key={i} style={{fontSize:12,color:C.tx2,padding:"5px 0",borderBottom:"0.5px solid "+C.gBd}}>{h.day} -- {h.date}</div>)}</div>}
+      {g.history?.length>0&&<div style={{marginTop:18}}>
+        <div style={{fontSize:10,color:C.tx3,letterSpacing:1.5,textTransform:"uppercase",marginBottom:10,fontWeight:600}}>Istoric</div>
+        <div style={{...glass(),borderRadius:14,padding:"4px 14px"}}>
+          {g.history.slice(0,5).map((h,i)=><div key={i} style={{fontSize:12,color:C.tx2,padding:"8px 0",borderBottom:i<4?"1px solid rgba(255,255,255,0.06)":"none"}}>{h.day} -- {h.date}</div>)}
+        </div>
+      </div>}
     </div>
   );
 }
@@ -508,67 +728,66 @@ function AffTab({st,setSt,toast,getAff,saveAff}){
   const doneCount=aff.filter(x=>checks[x.id]).length;
 
   return(
-    <div style={{padding:"16px 16px 4px"}}>
+    <div style={{padding:"4px 16px 4px"}}>
       <DBadge date={tod()} color={C.aA} bg={C.aCa}/>
-      <div style={{background:C.aCa,border:"1px solid "+(ready?C.aA+"88":C.aBd),borderRadius:14,padding:16,marginBottom:16,position:"relative",overflow:"hidden"}}>
-        {ready&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.aA}}/>}
-        <div style={{textAlign:"center",marginBottom:10}}>
-          <div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:6}}>Urmatoarea sesiune in</div>
-          <div style={{fontSize:38,fontWeight:800,color:tc,letterSpacing:3}}>{ready?"ACUM!":paused?"ZZZ":fmtT(timeLeft)}</div>
-          {ready&&<div style={{fontSize:13,color:C.aA,marginTop:6,fontWeight:600}}>E timpul sa iti spui afirmatiile!</div>}
-          {paused&&<div style={{fontSize:12,color:C.tx3,marginTop:6}}>In afara intervalului 06:00 - 00:00</div>}
+      <div style={{...glassTinted(C.aA,ready?0.10:0.06),borderRadius:18,padding:18,marginBottom:16,position:"relative",overflow:"hidden",...(ready?neonRing(C.aA):{})}}>
+        {ready&&<div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg, transparent, ${C.aA}, transparent)`}}/>}
+        <div style={{textAlign:"center",marginBottom:12}}>
+          <div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>Urmatoarea sesiune in</div>
+          <div style={{fontSize:38,fontWeight:800,color:tc,letterSpacing:3,textShadow:ready?`0 0 24px ${C.aA}aa, 0 0 40px ${C.aA}66`:"none"}}>{ready?"ACUM!":paused?"ZZZ":fmtT(timeLeft)}</div>
+          {ready&&<div style={{fontSize:13,color:C.aA,marginTop:8,fontWeight:600}}>E timpul sa iti spui afirmatiile!</div>}
+          {paused&&<div style={{fontSize:12,color:C.tx3,marginTop:8}}>In afara intervalului 06:00 - 00:00</div>}
         </div>
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:4}}>
-          <div style={{fontSize:11,color:C.tx3}}>Sesiuni totale: {a.sessionsDone||0}</div>
-          <div style={{fontSize:11,color:C.aA,fontWeight:600}}>{doneCount}/{aff.length} bifate</div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:6}}>
+          <div style={{fontSize:11,color:C.tx3,fontWeight:600}}>Sesiuni totale: {a.sessionsDone||0}</div>
+          <div style={{fontSize:11,color:C.aA,fontWeight:700}}>{doneCount}/{aff.length} bifate</div>
         </div>
       </div>
 
-      {/* HEADER + ADD */}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}}>
         <div style={{fontWeight:700,fontSize:15,color:C.tx}}>Afirmatiile mele ({aff.length})</div>
-        <button onClick={()=>setShowAdd(v=>!v)} style={{background:showAdd?C.aCa:C.aA,color:showAdd?C.tx3:"#003828",border:"none",borderRadius:20,padding:"6px 14px",fontWeight:700,fontSize:12,cursor:"pointer"}}>{showAdd?"Anuleaza":"+ Adauga"}</button>
+        <button onClick={()=>setShowAdd(v=>!v)} style={{...(showAdd?pillInactive:pillActive(C.aA)),borderRadius:99,padding:"7px 14px",fontWeight:700,fontSize:12,cursor:"pointer",letterSpacing:0.3,color:showAdd?C.tx3:"#001a16"}}>{showAdd?"Anuleaza":"+ Adauga"}</button>
       </div>
 
       {showAdd&&(
-        <div style={{background:C.aCa,border:"1px solid "+C.aA+"55",borderRadius:12,padding:12,marginBottom:14}}>
-          <textarea value={newText} onChange={e=>setNewText(e.target.value)} placeholder="Scrie noua afirmatie..." rows={2} autoFocus style={{width:"100%",boxSizing:"border-box",padding:"8px 10px",borderRadius:10,border:"1px solid "+C.aA+"55",background:C.aBg,color:C.tx,fontSize:13,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif",marginBottom:8}}/>
-          <button onClick={addAff} style={{width:"100%",padding:"8px 0",background:C.aA,color:"#003828",border:"none",borderRadius:9,fontWeight:700,fontSize:13,cursor:"pointer"}}>Adauga afirmatia</button>
+        <div style={{...glassTinted(C.aA,0.07),borderRadius:14,padding:14,marginBottom:14}}>
+          <textarea value={newText} onChange={e=>setNewText(e.target.value)} placeholder="Scrie noua afirmatie..." rows={2} autoFocus style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${C.aA}55`,background:C.ip,color:C.tx,fontSize:13,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif",marginBottom:10}}/>
+          <button onClick={addAff} style={{width:"100%",padding:"10px 0",...pillActive(C.aA),borderRadius:10,fontWeight:700,fontSize:13,cursor:"pointer",color:"#001a16"}}>Adauga afirmatia</button>
         </div>
       )}
 
       {aff.map((item,i)=>{
         const checked=checks[item.id]||false;const hasText=(refs[item.id]||"").trim().length>0;
         return(
-          <div key={item.id} style={{background:C.aCa,border:"1px solid "+(checked?C.aA+"66":C.aBd),borderRadius:14,padding:14,marginBottom:12,opacity:checked?0.7:1}}>
-            <div style={{display:"flex",alignItems:"flex-start",gap:8,marginBottom:10}}>
-              <div style={{width:24,height:24,minWidth:24,borderRadius:"50%",background:C.aA+"33",border:"1px solid "+C.aA+"55",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:C.aA,flexShrink:0}}>{i+1}</div>
+          <div key={item.id} style={{...glassTinted(C.aA,checked?0.04:0.06),borderRadius:14,padding:14,marginBottom:12,opacity:checked?0.7:1,...(checked?{border:`1px solid ${C.aA}55`}:{})}}>
+            <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:10}}>
+              <div style={{width:26,height:26,minWidth:26,borderRadius:"50%",background:`${C.aA}22`,border:`1px solid ${C.aA}66`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:C.aA,flexShrink:0,boxShadow:`0 0 8px ${C.aA}33`}}>{i+1}</div>
               {editId===item.id
                 ?<div style={{flex:1,display:"flex",gap:6,alignItems:"flex-start"}}>
-                  <textarea value={editVal} onChange={e=>setEditVal(e.target.value)} autoFocus rows={2} style={{flex:1,padding:"6px 8px",borderRadius:8,border:"1px solid "+C.aA,background:C.ip,color:C.tx,fontSize:14,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif"}}/>
+                  <textarea value={editVal} onChange={e=>setEditVal(e.target.value)} autoFocus rows={2} style={{flex:1,padding:"7px 10px",borderRadius:10,border:`1px solid ${C.aA}`,background:C.ip,color:C.tx,fontSize:14,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif"}}/>
                   <div style={{display:"flex",flexDirection:"column",gap:4}}>
-                    <button onClick={()=>saveEdit(item.id)} style={{background:C.grn,color:"#fff",border:"none",borderRadius:6,padding:"5px 8px",fontSize:12,cursor:"pointer",fontWeight:700}}>✓</button>
-                    <button onClick={()=>setEditId(null)} style={{background:"none",border:"1px solid "+C.aBd,borderRadius:6,padding:"5px 8px",fontSize:12,cursor:"pointer",color:C.tx3}}>x</button>
+                    <button onClick={()=>saveEdit(item.id)} style={{...pillActive(C.grn),borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer",fontWeight:700}}>✓</button>
+                    <button onClick={()=>setEditId(null)} style={{...pillInactive,borderRadius:8,padding:"5px 8px",fontSize:12,cursor:"pointer"}}>x</button>
                   </div>
                 </div>
                 :<div style={{flex:1,display:"flex",alignItems:"flex-start",gap:6}}>
                   <span style={{flex:1,fontSize:14,fontWeight:600,color:checked?C.tx3:C.aA,lineHeight:1.6,fontStyle:"italic",textDecoration:checked?"line-through":"none"}}>"{item.text}"</span>
                   {!checked&&<button onClick={()=>{setEditId(item.id);setEditVal(item.text);}} style={{background:"none",border:"none",cursor:"pointer",color:C.tx3,fontSize:13,padding:"0 2px",flexShrink:0}}>✎</button>}
-                  {!checked&&<button onClick={()=>deleteAff(item.id)} style={{background:"none",border:"none",cursor:"pointer",color:C.red+"99",fontSize:15,padding:"0 2px",flexShrink:0,lineHeight:1}}>×</button>}
+                  {!checked&&<button onClick={()=>deleteAff(item.id)} style={{background:"none",border:"none",cursor:"pointer",color:"rgba(239,68,68,0.6)",fontSize:15,padding:"0 2px",flexShrink:0,lineHeight:1}}>×</button>}
                 </div>}
             </div>
-            <div style={{marginLeft:32}}>
-              <div style={{fontSize:10,color:C.tx3,letterSpacing:1,textTransform:"uppercase",marginBottom:6}}>Rescrie cu propriile cuvinte</div>
-              <textarea value={refs[item.id]||""} onChange={e=>setRefs(p=>({...p,[item.id]:e.target.value}))} placeholder="Scrie afirmatia ta..." rows={2} disabled={checked} style={{width:"100%",boxSizing:"border-box",padding:"8px 10px",borderRadius:10,border:"1px solid "+(hasText?C.aA+"66":C.aBd),background:checked?"#001a13":C.aBg,color:C.tx,fontSize:13,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif",opacity:checked?0.6:1}}/>
-              <button onClick={()=>setChecks(p=>({...p,[item.id]:!p[item.id]}))} disabled={!hasText&&!checked} style={{marginTop:8,width:"100%",padding:"8px 0",background:checked?C.aA:"none",color:checked?"#001a13":hasText?C.aA:C.tx3,border:"1px solid "+(checked?C.aA:hasText?C.aA+"55":C.aBd),borderRadius:9,fontSize:13,fontWeight:700,cursor:(hasText||checked)?"pointer":"default",transition:"all 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:6}}>
-                <div style={{width:18,height:18,borderRadius:"50%",border:checked?"none":"2px solid "+C.aA,background:checked?C.aA+"33":"transparent",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:C.aA}}>{checked?"✓":""}</div>
+            <div style={{marginLeft:36}}>
+              <div style={{fontSize:10,color:C.tx3,letterSpacing:1.5,textTransform:"uppercase",marginBottom:6,fontWeight:600}}>Rescrie cu propriile cuvinte</div>
+              <textarea value={refs[item.id]||""} onChange={e=>setRefs(p=>({...p,[item.id]:e.target.value}))} placeholder="Scrie afirmatia ta..." rows={2} disabled={checked} style={{width:"100%",boxSizing:"border-box",padding:"9px 12px",borderRadius:10,border:`1px solid ${hasText?C.aA+"66":"rgba(255,255,255,0.10)"}`,background:C.ip,color:C.tx,fontSize:13,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif",opacity:checked?0.6:1}}/>
+              <button onClick={()=>setChecks(p=>({...p,[item.id]:!p[item.id]}))} disabled={!hasText&&!checked} style={{marginTop:10,width:"100%",padding:"9px 0",...(checked?pillActive(C.aA):hasText?pillActive(C.aA):pillInactive),borderRadius:10,fontSize:13,fontWeight:700,cursor:(hasText||checked)?"pointer":"default",transition:"all 0.2s",display:"flex",alignItems:"center",justifyContent:"center",gap:8,color:(checked||hasText)?"#001a16":C.tx3}}>
+                <div style={{width:18,height:18,borderRadius:"50%",border:checked?"none":`2px solid ${hasText?"#001a16":C.tx3}`,background:checked?"#001a16":"transparent",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,color:C.aA}}>{checked?"✓":""}</div>
                 {checked?"Bifata":"Bifeaza afirmatia"}
               </button>
             </div>
           </div>
         );
       })}
-      <div style={{marginBottom:20,textAlign:"center",fontSize:12,color:C.tx3}}>{allChecked?"Timer pornit automat!":"Bifeaza toate afirmatiile pentru a porni timer-ul"}</div>
+      <div style={{marginBottom:20,textAlign:"center",fontSize:12,color:C.tx3,padding:"10px"}}>{allChecked?"Timer pornit automat!":"Bifeaza toate afirmatiile pentru a porni timer-ul"}</div>
     </div>
   );
 }
@@ -614,32 +833,31 @@ function PrayerTab({st,setSt,toast}){
   const openItem=openId?items.find(x=>x.key===openId):null;
 
   return(
-    <div style={{padding:"16px 16px 4px"}}>
+    <div style={{padding:"4px 16px 4px"}}>
       <DBadge date={t} color={C.pA} bg={C.pCa}/>
 
-      {/* POPUP */}
       {openItem&&(
-        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.85)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={()=>setOpenId(null)}>
-          <div style={{background:C.pSu,border:"1px solid "+C.pA+"66",borderRadius:18,padding:24,maxWidth:400,width:"100%",maxHeight:"80vh",overflowY:"auto",position:"relative"}} onClick={e=>e.stopPropagation()}>
-            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
-              <span style={{fontSize:24}}>{openItem.emoji}</span>
-              <div style={{flex:1,fontSize:16,fontWeight:700,color:C.pA}}>{openItem.label}</div>
-              <button onClick={()=>setOpenId(null)} style={{background:"none",border:"none",cursor:"pointer",color:C.tx3,fontSize:22,lineHeight:1,padding:"0 4px"}}>×</button>
+        <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",backdropFilter:"blur(8px)",WebkitBackdropFilter:"blur(8px)",zIndex:500,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={()=>setOpenId(null)}>
+          <div style={{...glassTinted(C.pA,0.08),borderRadius:22,padding:26,maxWidth:400,width:"100%",maxHeight:"80vh",overflowY:"auto",position:"relative",...neonRing(C.pA)}} onClick={e=>e.stopPropagation()}>
+            <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:18}}>
+              <span style={{fontSize:26}}>{openItem.emoji}</span>
+              <div style={{flex:1,fontSize:16,fontWeight:800,color:C.pA,letterSpacing:-0.2}}>{openItem.label}</div>
+              <button onClick={()=>setOpenId(null)} style={{...pillInactive,borderRadius:"50%",width:30,height:30,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",fontSize:18,padding:0}}>×</button>
             </div>
             {editId===openItem.key
               ?<div>
-                <textarea value={editVal} onChange={e=>setEditVal(e.target.value)} rows={8} autoFocus style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:"1px solid "+C.pA,background:C.ip,color:C.tx,fontSize:14,outline:"none",resize:"none",lineHeight:1.7,fontFamily:"system-ui,sans-serif",marginBottom:10}}/>
+                <textarea value={editVal} onChange={e=>setEditVal(e.target.value)} rows={8} autoFocus style={{width:"100%",boxSizing:"border-box",padding:"12px 14px",borderRadius:12,border:`1px solid ${C.pA}66`,background:C.ip,color:C.tx,fontSize:14,outline:"none",resize:"none",lineHeight:1.7,fontFamily:"system-ui,sans-serif",marginBottom:12}}/>
                 <div style={{display:"flex",gap:8}}>
-                  <button onClick={()=>saveEdit(openItem.key)} style={{flex:1,padding:"10px 0",background:C.pA,color:"#fff",border:"none",borderRadius:9,fontWeight:700,fontSize:14,cursor:"pointer"}}>Salveaza</button>
-                  <button onClick={()=>setEditId(null)} style={{padding:"10px 16px",background:"none",border:"1px solid "+C.pBd,borderRadius:9,color:C.tx3,fontSize:14,cursor:"pointer"}}>Anuleaza</button>
+                  <button onClick={()=>saveEdit(openItem.key)} style={{flex:1,padding:"11px 0",...pillActive(C.pA),borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer"}}>Salveaza</button>
+                  <button onClick={()=>setEditId(null)} style={{padding:"11px 18px",...pillInactive,borderRadius:10,fontSize:14,cursor:"pointer"}}>Anuleaza</button>
                 </div>
               </div>
               :<div>
-                <p style={{margin:"0 0 20px",fontSize:15,color:C.tx,lineHeight:1.8,whiteSpace:"pre-wrap"}}>{pTexts[openItem.key]}</p>
+                <p style={{margin:"0 0 22px",fontSize:15,color:C.tx,lineHeight:1.8,whiteSpace:"pre-wrap"}}>{pTexts[openItem.key]}</p>
                 <div style={{display:"flex",gap:8,flexDirection:"column"}}>
-                  {!openItem.done&&<button onClick={()=>{setEditId(openItem.key);setEditVal(pTexts[openItem.key]);}} style={{width:"100%",padding:"10px 0",background:"none",color:C.tx3,border:"1px solid "+C.pBd,borderRadius:9,fontWeight:600,fontSize:13,cursor:"pointer"}}>✎ Editeaza rugaciunea</button>}
-                  <button onClick={()=>{toggle(openItem.key);setOpenId(null);}} style={{width:"100%",padding:"12px 0",background:openItem.done?C.pA+"22":C.pA,color:openItem.done?C.pA:"#fff",border:"1px solid "+C.pA,borderRadius:9,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
-                    <div style={{width:22,height:22,borderRadius:"50%",border:openItem.done?"none":"2px solid #fff",background:openItem.done?C.pA:"transparent",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",flexShrink:0}}>{openItem.done?"✓":""}</div>
+                  {!openItem.done&&<button onClick={()=>{setEditId(openItem.key);setEditVal(pTexts[openItem.key]);}} style={{width:"100%",padding:"10px 0",...pillInactive,borderRadius:10,fontWeight:600,fontSize:13,cursor:"pointer"}}>✎ Editeaza rugaciunea</button>}
+                  <button onClick={()=>{toggle(openItem.key);setOpenId(null);}} style={{width:"100%",padding:"13px 0",...(openItem.done?glassTinted(C.pA,0.10):pillActive(C.pA)),borderRadius:10,fontWeight:700,fontSize:14,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",gap:10,color:openItem.done?C.pA:"#fff",border:`1px solid ${C.pA}`}}>
+                    <div style={{width:22,height:22,borderRadius:"50%",border:openItem.done?"none":"2px solid #fff",background:openItem.done?C.pA:"transparent",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",flexShrink:0,boxShadow:openItem.done?`0 0 10px ${C.pA}aa`:"none"}}>{openItem.done?"✓":""}</div>
                     {openItem.done?"Am spus rugaciunea ✓":"Am spus rugaciunea"}
                   </button>
                 </div>
@@ -648,27 +866,32 @@ function PrayerTab({st,setSt,toast}){
         </div>
       )}
 
-      {/* STATS */}
-      <div style={{background:C.pCa,border:"1px solid "+(bothDone?C.pA+"88":C.pBd),borderRadius:14,padding:16,marginBottom:16,position:"relative",overflow:"hidden"}}>
-        {bothDone&&<div style={{position:"absolute",top:0,left:0,right:0,height:3,background:C.pA}}/>}
+      <div style={{...glassTinted(C.pA,bothDone?0.10:0.06),borderRadius:18,padding:18,marginBottom:16,position:"relative",overflow:"hidden",...(bothDone?neonRing(C.pA):{})}}>
+        {bothDone&&<div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg, transparent, ${C.pA}, transparent)`}}/>}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-          <div><div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>Zile de rugaciune</div><div style={{fontSize:28,fontWeight:800,color:C.pA}}>{p.daysDone||0}</div></div>
-          <div style={{textAlign:"right"}}><div style={{fontSize:13,color:bothDone?C.pA:C.tx3,fontWeight:600}}>{bothDone?"Zi completa":""}</div><div style={{fontSize:12,color:C.tx2,marginTop:4}}>{(mDone?1:0)+(eDone?1:0)}/2 bifate</div></div>
+          <div>
+            <div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:5,fontWeight:600}}>Zile de rugaciune</div>
+            <div style={{fontSize:32,fontWeight:800,color:C.pA,letterSpacing:-0.5,textShadow:bothDone?`0 0 16px ${C.pA}66`:"none"}}>{p.daysDone||0}</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:13,color:bothDone?C.pA:C.tx3,fontWeight:700}}>{bothDone?"Zi completa":""}</div>
+            <div style={{fontSize:12,color:C.tx2,marginTop:4}}>{(mDone?1:0)+(eDone?1:0)}/2 bifate</div>
+          </div>
         </div>
       </div>
 
       <div style={{fontWeight:700,fontSize:15,marginBottom:12,color:C.tx}}>Rugaciunile mele</div>
       {items.map(item=>(
-        <div key={item.key} onClick={()=>setOpenId(item.key)} style={{background:C.pCa,border:"1px solid "+(item.done?C.pA+"66":C.pBd),borderRadius:14,padding:"16px",marginBottom:14,cursor:"pointer",display:"flex",alignItems:"center",gap:14,transition:"all 0.2s"}}>
+        <div key={item.key} onClick={()=>setOpenId(item.key)} style={{...glassTinted(C.pA,item.done?0.08:0.05),borderRadius:14,padding:"16px",marginBottom:12,cursor:"pointer",display:"flex",alignItems:"center",gap:14,transition:"all 0.2s",...(item.done?{border:`1px solid ${C.pA}66`}:{})}}>
           <span style={{fontSize:28,lineHeight:1}}>{item.emoji}</span>
           <div style={{flex:1}}>
-            <div style={{fontSize:15,fontWeight:700,color:item.done?C.pA:C.tx,marginBottom:4}}>{item.label}</div>
+            <div style={{fontSize:15,fontWeight:800,color:item.done?C.pA:C.tx,marginBottom:4,letterSpacing:-0.2}}>{item.label}</div>
             <div style={{fontSize:12,color:C.tx3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",maxWidth:220}}>{pTexts[item.key]}</div>
           </div>
           <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:4}}>
             {item.done
-              ?<div style={{width:28,height:28,borderRadius:"50%",background:C.pA,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:"#fff"}}>✓</div>
-              :<div style={{width:28,height:28,borderRadius:"50%",border:"2px solid "+C.pA,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:C.pA}}>›</div>}
+              ?<div style={{width:30,height:30,borderRadius:"50%",background:C.pA,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:"#fff",boxShadow:`0 0 14px ${C.pA}aa`}}>✓</div>
+              :<div style={{width:30,height:30,borderRadius:"50%",border:`2px solid ${C.pA}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:C.pA,boxShadow:`0 0 0 4px ${C.pA}11`}}>›</div>}
           </div>
         </div>
       ))}
@@ -676,15 +899,247 @@ function PrayerTab({st,setSt,toast}){
   );
 }
 
+function CircleProg({pct,color,label,emoji,onClick}){
+  const r=28;
+  const circ=2*3.14159*r;
+  const filled=(pct/100)*circ;
+  return(
+    <div onClick={onClick} style={{textAlign:"center",cursor:"pointer",padding:"8px 4px",borderRadius:14,transition:"all 0.2s"}}>
+      <div style={{position:"relative",width:70,height:70,margin:"0 auto"}}>
+        <svg width={70} height={70} viewBox="0 0 70 70" style={{filter:pct>0?`drop-shadow(0 0 8px ${color}88)`:"none"}}>
+          <circle cx="35" cy="35" r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="5"/>
+          <circle cx="35" cy="35" r={r} fill="none" stroke={color} strokeWidth="5"
+            strokeDasharray={filled+" "+(circ-filled)}
+            strokeLinecap="round"
+            transform="rotate(-90 35 35)"/>
+          <text x="35" y="40" textAnchor="middle" fill={color} fontSize="13" fontWeight="800">{pct}%</text>
+        </svg>
+      </div>
+      <div style={{fontSize:18,marginTop:4}}>{emoji}</div>
+      <div style={{fontSize:11,color:C.tx2,marginTop:2,fontWeight:600,letterSpacing:0.3}}>{label}</div>
+    </div>
+  );
+}
+
+function HomeTab({st,setTab}){
+  const t=tod();
+  const d=st.daily;
+  const w=st.work;
+  const g=st.gym;
+  const pr=st.prayer;
+  const aff=st.aff;
+  const dPct=d.tasks.length>0?Math.round((d.tasks.filter(x=>x.done).length/d.tasks.length)*100):0;
+  const wPct=w.tasks.length>0?Math.round((w.tasks.filter(x=>x.done).length/w.tasks.length)*100):0;
+  const mp=g.mp||MP;
+  const nonRest=mp.filter(x=>!x.rest);
+  const comp=g.completed||{};
+  const gymDone=nonRest.filter(x=>comp[x.id+"-morning"]&&comp[x.id+"-evening"]).length;
+  const gPct=nonRest.length>0?Math.round((gymDone/nonRest.length)*100):0;
+  const isToday=pr.lastDate===t;
+  const prPct=Math.round(((isToday&&pr.morning?1:0)+(isToday&&pr.evening?1:0))/2*100);
+  const affPct=aff.lastSession===t?100:0;
+  const rules=st.rules?.list||DEFAULT_RULES;
+  const rPct=rules.length>0?100:0;
+  const sg=st.sugar||INIT.sugar;
+  const al=st.alcohol||INIT.alcohol;
+  const sgPct=sg.lastDate===t&&sg.done?100:0;
+  const alPct=al.lastDate===t&&al.done?100:0;
+  const lv=getLvl(st.xp);
+  const xpC=st.xp-xpCurLvl(lv);
+  const xpN=xpNext(lv)-xpCurLvl(lv);
+  const cats=[
+    {key:"daily",emoji:"📅",label:"Daily",pct:dPct,color:C.dA},
+    {key:"work",emoji:"💼",label:"Work",pct:wPct,color:C.wA},
+    {key:"gym",emoji:"🏋",label:"Gym",pct:gPct,color:C.gA},
+    {key:"aff",emoji:"🌟",label:"Afirmatii",pct:affPct,color:C.aA},
+    {key:"prayer",emoji:"🙏",label:"Rugaciune",pct:prPct,color:C.pA},
+    {key:"rules",emoji:"📜",label:"Reguli",pct:rPct,color:C.rA},
+    {key:"sugar",emoji:"🍭",label:"Fara zahar",pct:sgPct,color:C.sgA},
+    {key:"alcohol",emoji:"🍷",label:"Fara alcool",pct:alPct,color:C.alA},
+  ];
+  const totalPct=Math.round(cats.reduce((a,c)=>a+c.pct,0)/cats.length);
+  return(
+    <div style={{padding:"4px 16px 4px"}}>
+      <DBadge date={t} color={C.acL} bg={C.ca}/>
+      <div style={{...glass(),borderRadius:18,padding:18,marginBottom:18,display:"flex",alignItems:"center",gap:16}}>
+        <CircleProg pct={totalPct} color={C.acL} label="Total" emoji="⚔️" onClick={()=>{}}/>
+        <div style={{flex:1}}>
+          <div style={{fontSize:18,fontWeight:800,color:C.tx,marginBottom:4,letterSpacing:-0.3}}>{st.heroName}</div>
+          <div style={{fontSize:12,color:C.acL,marginBottom:10,fontWeight:600}}>Nivel {lv} Aventurier</div>
+          <div style={{fontSize:11,color:C.tx3,marginBottom:4,letterSpacing:0.5,fontWeight:600}}>XP {xpC}/{xpN}</div>
+          <div style={{height:6,background:"rgba(0,0,0,0.4)",borderRadius:99,overflow:"hidden",border:"1px solid rgba(255,255,255,0.05)"}}>
+            <div style={{height:"100%",width:Math.round((xpC/xpN)*100)+"%",background:`linear-gradient(90deg, ${C.acL}, ${C.acL}dd)`,borderRadius:99,boxShadow:`0 0 10px ${C.acL}88`}}/>
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}>
+            <div style={{fontSize:12,color:C.tx2}}>Streak <span style={{color:C.gold,fontWeight:800}}>{st.streak}</span> zile</div>
+            <div style={{fontSize:12,color:st.hp>50?C.grn:st.hp>25?C.ylw:C.red,fontWeight:700}}>HP {st.hp}/{MAX_HP}</div>
+          </div>
+        </div>
+      </div>
+      <div style={{fontWeight:700,fontSize:15,marginBottom:14,color:C.tx,letterSpacing:-0.2}}>Progres de azi</div>
+      <div style={{...glass(),borderRadius:18,padding:"18px 10px",marginBottom:20,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,placeItems:"center"}}>
+        <CircleProg pct={cats[0].pct} color={cats[0].color} label={cats[0].label} emoji={cats[0].emoji} onClick={()=>setTab(cats[0].key)}/>
+        <CircleProg pct={cats[1].pct} color={cats[1].color} label={cats[1].label} emoji={cats[1].emoji} onClick={()=>setTab(cats[1].key)}/>
+        <CircleProg pct={cats[2].pct} color={cats[2].color} label={cats[2].label} emoji={cats[2].emoji} onClick={()=>setTab(cats[2].key)}/>
+        <CircleProg pct={cats[3].pct} color={cats[3].color} label={cats[3].label} emoji={cats[3].emoji} onClick={()=>setTab(cats[3].key)}/>
+        <div style={{textAlign:"center",padding:"8px 4px"}}>
+          <div style={{width:70,height:70,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <div style={{
+              width:65,height:65,borderRadius:"50%",
+              background:`radial-gradient(circle, ${C.acL}33, ${C.acL}11)`,
+              border:`1px solid ${C.acL}55`,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontSize:34,
+              boxShadow:`0 0 18px ${C.acL}44, inset 0 1px 0 rgba(255,255,255,0.15)`,
+            }}>🥷</div>
+          </div>
+          <div style={{height:22,marginTop:4}}/>
+          <div style={{fontSize:11,color:C.acL,marginTop:2,fontWeight:700,letterSpacing:0.3}}>{st.heroName}</div>
+        </div>
+        <CircleProg pct={cats[4].pct} color={cats[4].color} label={cats[4].label} emoji={cats[4].emoji} onClick={()=>setTab(cats[4].key)}/>
+        <CircleProg pct={cats[5].pct} color={cats[5].color} label={cats[5].label} emoji={cats[5].emoji} onClick={()=>setTab(cats[5].key)}/>
+        <CircleProg pct={cats[6].pct} color={cats[6].color} label={cats[6].label} emoji={cats[6].emoji} onClick={()=>setTab(cats[6].key)}/>
+        <CircleProg pct={cats[7].pct} color={cats[7].color} label={cats[7].label} emoji={cats[7].emoji} onClick={()=>setTab(cats[7].key)}/>
+      </div>
+    </div>
+  );
+}
+
+function RulesTab({st,setSt,toast}){
+  const rules=st.rules?.list||DEFAULT_RULES;
+  const [editId,setEditId]=useState(null);
+  const [editVal,setEditVal]=useState("");
+  const [showAdd,setShowAdd]=useState(false);
+  const [newText,setNewText]=useState("");
+  function saveRules(l){setSt(s=>({...s,rules:{...s.rules,list:l}}));}
+  function saveEdit(id){const v=editVal.trim();if(!v)return;saveRules(rules.map(x=>x.id===id?{...x,text:v}:x));setEditId(null);toast("Regula actualizata!",C.rA);}
+  function addRule(){const v=newText.trim();if(!v)return;saveRules([...rules,{id:"r"+Date.now(),text:v}]);setNewText("");setShowAdd(false);toast("Regula adaugata!",C.rA);}
+  function deleteRule(id){saveRules(rules.filter(x=>x.id!==id));}
+  return(
+    <div style={{padding:"4px 16px 4px"}}>
+      <DBadge date={tod()} color={C.rA} bg={C.rCa}/>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}}>
+        <div style={{fontWeight:700,fontSize:15,color:C.tx}}>Regulile mele ({rules.length})</div>
+        <button onClick={()=>setShowAdd(v=>!v)} style={{...(showAdd?pillInactive:pillActive(C.rA)),borderRadius:99,padding:"7px 14px",fontWeight:700,fontSize:12,cursor:"pointer",letterSpacing:0.3,color:showAdd?C.tx3:"#1a1400"}}>{showAdd?"Anuleaza":"+ Adauga"}</button>
+      </div>
+      {showAdd&&(
+        <div style={{...glassTinted(C.rA,0.07),borderRadius:14,padding:14,marginBottom:14}}>
+          <textarea value={newText} onChange={e=>setNewText(e.target.value)} placeholder="Scrie noua regula..." rows={2} autoFocus style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:`1px solid ${C.rA}55`,background:C.ip,color:C.tx,fontSize:13,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif",marginBottom:10}}/>
+          <button onClick={addRule} style={{width:"100%",padding:"10px 0",...pillActive(C.rA),borderRadius:10,fontWeight:700,fontSize:13,cursor:"pointer",color:"#1a1400"}}>Adauga regula</button>
+        </div>
+      )}
+      {rules.length===0&&<Empty emoji="📜" text="Nicio regula. Adauga prima ta regula!"/>}
+      {rules.map((rule,i)=>(
+        <div key={rule.id} style={{...glassTinted(C.rA,0.05),borderRadius:14,padding:14,marginBottom:10}}>
+          <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+            <div style={{width:26,height:26,minWidth:26,borderRadius:"50%",background:`${C.rA}22`,border:`1px solid ${C.rA}66`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:800,color:C.rA,flexShrink:0,boxShadow:`0 0 8px ${C.rA}33`}}>{i+1}</div>
+            {editId===rule.id?(
+              <div style={{flex:1}}>
+                <textarea value={editVal} onChange={e=>setEditVal(e.target.value)} rows={2} autoFocus style={{width:"100%",boxSizing:"border-box",padding:"7px 10px",borderRadius:10,border:`1px solid ${C.rA}`,background:C.ip,color:C.tx,fontSize:14,outline:"none",resize:"none",lineHeight:1.5,fontFamily:"system-ui,sans-serif",marginBottom:10}}/>
+                <div style={{display:"flex",gap:8}}>
+                  <button onClick={()=>saveEdit(rule.id)} style={{flex:1,padding:"8px 0",...pillActive(C.grn),borderRadius:10,fontWeight:700,fontSize:13,cursor:"pointer"}}>Salveaza</button>
+                  <button onClick={()=>setEditId(null)} style={{padding:"8px 14px",...pillInactive,borderRadius:10,fontSize:13,cursor:"pointer"}}>Anuleaza</button>
+                </div>
+              </div>
+            ):(
+              <div style={{flex:1,display:"flex",alignItems:"flex-start",gap:6}}>
+                <span style={{flex:1,fontSize:14,color:C.tx,lineHeight:1.6}}>{rule.text}</span>
+                <button onClick={()=>{setEditId(rule.id);setEditVal(rule.text);}} style={{background:"none",border:"none",cursor:"pointer",color:C.tx3,fontSize:13,padding:"0 2px",flexShrink:0}}>✎</button>
+                <button onClick={()=>deleteRule(rule.id)} style={{background:"none",border:"none",cursor:"pointer",color:"rgba(239,68,68,0.6)",fontSize:16,padding:"0 2px",flexShrink:0,lineHeight:1}}>x</button>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HabitTab({st,setSt,toast,habitKey,accent,tinted,title,subtitle,emoji,tagline}){
+  const t=tod();
+  const h=st[habitKey]||{lastDate:"",done:false,daysDone:0};
+  const isToday=h.lastDate===t;
+  const done=isToday&&h.done;
+
+  function toggle(){
+    setSt(s=>{
+      const cur=s[habitKey]||{lastDate:"",done:false,daysDone:0};
+      const wasToday=cur.lastDate===t;
+      const newDone=wasToday?!cur.done:true;
+      let nd=cur.daysDone||0;
+      if(newDone&&!(wasToday&&cur.done))nd=nd+1;
+      else if(!newDone&&wasToday&&cur.done)nd=Math.max(0,nd-1);
+      if(newDone&&!(wasToday&&cur.done))toast(tagline+"! ("+nd+")",accent);
+      return{...s,[habitKey]:{lastDate:t,done:newDone,daysDone:nd}};
+    });
+  }
+
+  return(
+    <div style={{padding:"4px 16px 4px"}}>
+      <DBadge date={t} color={accent} bg={tinted}/>
+
+      <div style={{...glassTinted(accent,done?0.10:0.06),borderRadius:18,padding:18,marginBottom:16,position:"relative",overflow:"hidden",...(done?neonRing(accent):{})}}>
+        {done&&<div style={{position:"absolute",top:0,left:0,right:0,height:2,background:`linear-gradient(90deg, transparent, ${accent}, transparent)`}}/>}
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+          <div>
+            <div style={{fontSize:10,color:C.tx3,letterSpacing:2,textTransform:"uppercase",marginBottom:5,fontWeight:600}}>{subtitle}</div>
+            <div style={{fontSize:32,fontWeight:800,color:accent,letterSpacing:-0.5,textShadow:done?`0 0 16px ${accent}66`:"none"}}>{h.daysDone||0}</div>
+            <div style={{fontSize:11,color:C.tx2,marginTop:4}}>zile totale</div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:46,lineHeight:1,filter:done?`drop-shadow(0 0 12px ${accent}aa)`:"none"}}>{emoji}</div>
+          </div>
+        </div>
+      </div>
+
+      <div style={{fontWeight:700,fontSize:15,marginBottom:12,color:C.tx}}>{title}</div>
+
+      <div style={{...glassTinted(accent,done?0.10:0.05),borderRadius:14,padding:"18px",marginBottom:14,...(done?{border:`1px solid ${accent}66`}:{})}}>
+        <div style={{display:"flex",alignItems:"center",gap:14}}>
+          <span style={{fontSize:32,lineHeight:1}}>{emoji}</span>
+          <div style={{flex:1}}>
+            <div style={{fontSize:15,fontWeight:800,color:done?accent:C.tx,marginBottom:4,letterSpacing:-0.2}}>{tagline}</div>
+            <div style={{fontSize:12,color:C.tx3}}>{done?"Bifat astazi":"Apasa pentru a bifa ziua"}</div>
+          </div>
+        </div>
+        <button onClick={toggle} style={{
+          marginTop:14,width:"100%",padding:"13px 0",
+          ...(done?glassTinted(accent,0.12):pillActive(accent)),
+          borderRadius:12,fontSize:14,fontWeight:700,cursor:"pointer",
+          display:"flex",alignItems:"center",justifyContent:"center",gap:10,
+          color:done?accent:"#fff",border:`1px solid ${accent}`,letterSpacing:0.3,
+        }}>
+          <div style={{
+            width:22,height:22,borderRadius:"50%",
+            border:done?"none":"2px solid #fff",
+            background:done?accent:"transparent",
+            display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,color:"#fff",flexShrink:0,
+            boxShadow:done?`0 0 12px ${accent}aa`:"none",
+          }}>{done?"✓":""}</div>
+          {done?"Bifat ✓":"Bifeaza ziua"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Setup({onSetup}){
   const [n,setN]=useState("");
   return(
-    <div style={{background:C.bg,minHeight:"100vh",maxWidth:420,margin:"0 auto",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"40px 24px",textAlign:"center",color:C.tx,fontFamily:"system-ui,sans-serif"}}>
-      <div style={{fontSize:52,marginBottom:16}}>⚔️</div>
-      <div style={{fontSize:26,fontWeight:800,marginBottom:8}}>Daily Quest</div>
-      <div style={{fontSize:14,color:C.tx2,marginBottom:36,lineHeight:1.6,maxWidth:300}}>Transforma-ti obiectivele zilnice in misiuni epice.</div>
-      <input value={n} onChange={e=>setN(e.target.value)} onKeyDown={e=>e.key==="Enter"&&onSetup(n)} placeholder="Numele tau..." autoFocus style={{width:"100%",padding:"13px 16px",borderRadius:12,border:"1px solid "+C.bd,background:C.ca,color:C.tx,fontSize:16,marginBottom:14,boxSizing:"border-box",outline:"none"}}/>
-      <button onClick={()=>onSetup(n)} style={{width:"100%",padding:14,background:C.ac,color:"#fff",border:"none",borderRadius:12,fontSize:16,fontWeight:700,cursor:"pointer"}}>Incepe aventura</button>
+    <div style={{
+      background:`radial-gradient(ellipse 80% 50% at 50% 0%, ${C.acL}33, transparent 60%), radial-gradient(ellipse 60% 40% at 50% 100%, ${C.cyan}22, transparent 60%), ${C.bg}`,
+      minHeight:"100vh",width:"100%",
+      display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",
+      padding:"40px 24px",textAlign:"center",color:C.tx,
+      fontFamily:"system-ui,-apple-system,sans-serif"
+    }}>
+      <div style={{...glass(),borderRadius:24,padding:"36px 28px",width:"100%",maxWidth:420,boxSizing:"border-box",...neonRing(C.acL)}}>
+        <div style={{fontSize:56,marginBottom:18,filter:`drop-shadow(0 0 20px ${C.acL}88)`}}>⚔️</div>
+        <div style={{fontSize:28,fontWeight:800,marginBottom:8,letterSpacing:-0.5}}>Daily Quest</div>
+        <div style={{fontSize:14,color:C.tx2,marginBottom:32,lineHeight:1.6,maxWidth:300,margin:"0 auto 32px"}}>Transforma-ti obiectivele zilnice in misiuni epice.</div>
+        <input value={n} onChange={e=>setN(e.target.value)} onKeyDown={e=>e.key==="Enter"&&onSetup(n)} placeholder="Numele tau..." autoFocus style={{width:"100%",padding:"14px 18px",borderRadius:14,border:"1px solid rgba(255,255,255,0.12)",background:"rgba(0,0,0,0.25)",color:C.tx,fontSize:16,marginBottom:14,boxSizing:"border-box",outline:"none"}}/>
+        <button onClick={()=>onSetup(n)} style={{width:"100%",padding:14,...pillActive(C.ac),borderRadius:14,fontSize:16,fontWeight:700,cursor:"pointer",letterSpacing:0.3}}>Incepe aventura</button>
+      </div>
     </div>
   );
 }
