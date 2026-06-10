@@ -114,7 +114,10 @@ const MP=[
     {name:"Trapez",sets:s3x("20 Kg")},
   ]},
   {id:3,name:"Leg Day 1",emoji:"🟢",rest:false,exercises:LEGS},
-  {id:4,name:"Rest Day",emoji:"😴",rest:true,exercises:[]},
+  {id:4,name:"ForeArms & Abdomen",emoji:"🟠",rest:false,exercises:[
+    {name:"Wrist Curls",sets:s3x("15 Kg")},
+    {name:"Cable Crunch Abdomen",sets:s3x("30 Kg")},
+  ]},
   {id:5,name:"Push Day 2",emoji:"🔴",rest:false,exercises:[
     {name:"Decline Chest Push",sets:s3x("10 Kg")},
     {name:"Shoulder Press",sets:s3x("10 Kg")},
@@ -133,6 +136,10 @@ const MP=[
     {name:"Traps",sets:s3x("20 Kg")},
   ]},
   {id:7,name:"Leg Day 2",emoji:"🟢",rest:false,exercises:LEGS},
+  {id:8,name:"ForeArms & Abdomen",emoji:"🟠",rest:false,exercises:[
+    {name:"Wrist Curls",sets:s3x("15 Kg")},
+    {name:"Cable Crunch Abdomen",sets:s3x("30 Kg")},
+  ]},
 ];
 
 const EVE=[
